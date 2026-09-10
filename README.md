@@ -111,7 +111,7 @@ pass an installation token to `token`.
 
 ## How It Works
 
-1. Reads the lychee report and groups the unreachable links by URL, keeping every location that references each one.
+1. Reads the lychee report, grouping the failed and timed-out links by URL with every location that references them.
 2. Lists the open issues carrying `label`, and reads the `<!-- lychee: <url> -->` marker from each body.
 3. Opens an issue for every unreachable link that has no issue yet.
 4. Closes the issues whose links no longer appear in the report.

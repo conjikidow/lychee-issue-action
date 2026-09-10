@@ -7,7 +7,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 records=$(mktemp)
 jq -c --arg prefix "file://${GITHUB_WORKSPACE}/" '
   [
-    (.error_map // {}) | to_entries[] | .key as $file | .value[] | {
+    ((.error_map // {}), (.timeout_map // {})) | to_entries[] | .key as $file | .value[] | {
       url: (.url | if startswith($prefix) then ltrimstr($prefix) else . end),
       status: .status.text,
       ref: "\($file):\(.span.line // "?")",

@@ -9,31 +9,48 @@ while IFS= read -r name <&3; do
   label_args+=(--label "$(csv_field "${name}")")
 done 3< <(split_labels "${LABEL},${EXTRA_LABELS}")
 
-# An issue outlives the run that opened it, so the link has to stay useful after that run.
 workflow=${GITHUB_WORKFLOW_REF%%@*}
 report_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/workflows/${workflow##*/}"
+
+blob_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/blob/${GITHUB_SHA}"
 
 reported_urls=$(mktemp)
 cut -f2 "${REPORTED}" >"${reported_urls}"
 
-# GitHub rejects a body longer than 65536 characters, and a link referenced everywhere would reach it.
-refs_limit=50
+# GitHub rejects a body longer than 65536 characters, which a link referenced from long paths can reach.
+body_limit=65536
+body_overhead=1024
+refs_limit=20
 
 write_body() {
   local record=$1
   local url=$2
+  local status=$3
+  local budget=$4
 
   printf 'A link check found this link to be unreachable.\n\n'
   printf -- '- URL: %s\n' "${url}"
-  printf -- '- Status: %s\n\n' "$(jq -r '.status' <<<"${record}")"
+  printf -- '- Status: %s\n\n' "${status}"
   printf 'Referenced from:\n\n'
-  jq -r --argjson limit "${refs_limit}" '.refs[:$limit][] | "- `\(.)`"' <<<"${record}"
-
-  local omitted
-  omitted=$(jq -r --argjson limit "${refs_limit}" '(.refs | length) - $limit | if . > 0 then . else 0 end' <<<"${record}")
-  if [ "${omitted}" -gt 0 ]; then
-    printf '\nand %s more.\n' "${omitted}"
-  fi
+  jq -r --argjson limit "${refs_limit}" --argjson budget "${budget}" --arg blob "${blob_url}" '
+    [
+      .refs[:$limit][]
+      | (.file | gsub("[`[:cntrl:]]"; "\uFFFD")) as $name
+      | (if .line then "\($name):\(.line)" else "\($name):?" end) as $text
+      | if (.file | test("^[a-zA-Z][a-zA-Z0-9+.-]*://")) then
+          "- `\($text)`"
+        else
+          (.file | split("/") | map(@uri | gsub("\\("; "%28") | gsub("\\)"; "%29")) | join("/")) as $path
+          | (if .line then "#L\(.line)" else "" end) as $fragment
+          | "- [`\($text)`](\($blob)/\($path)\($fragment))"
+        end
+    ] as $lines
+    | ([foreach $lines[] as $line (0; . + ($line | length) + 1)]) as $cumulative
+    | ([$cumulative[] | select(. <= $budget)] | length) as $kept
+    | ((.refs | length) - $kept) as $omitted
+    | $lines[:$kept][],
+      (if $omitted > 0 then "\nand \($omitted) more." else empty end)
+  ' <<<"${record}"
   printf '\nSee the [workflow runs](%s) for the latest report.\n' "${report_url}"
   printf '\n<!-- lychee: %s -->\n' "${url}"
 }
@@ -46,8 +63,16 @@ while IFS= read -r record <&3; do
     continue
   fi
 
+  status=$(jq -r '.status | tostring' <<<"${record}")
+  budget=$(jq -r --argjson limit "${body_limit}" --argjson overhead "${body_overhead}" \
+    '$limit - $overhead - 2 * (.url | tostring | length) - (.status | tostring | length)' <<<"${record}")
+  if [ "${budget}" -le 0 ]; then
+    log_warn "No issue opened for ${url}: it does not fit in an issue body."
+    continue
+  fi
+
   body=$(mktemp)
-  write_body "${record}" "${url}" >"${body}"
+  write_body "${record}" "${url}" "${status}" "${budget}" >"${body}"
   # GitHub rejects a title longer than 256 characters.
   title="${TITLE_PREFIX} ${url}"
   if [ "${#title}" -gt 256 ]; then

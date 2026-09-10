@@ -5,12 +5,12 @@ set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
 records=$(mktemp)
-jq -c --arg prefix "file://${GITHUB_WORKSPACE}/" '
+jq -c --arg prefix "file://${GITHUB_WORKSPACE}/" --arg root "${GITHUB_WORKSPACE}/" '
   [
     ((.error_map // {}), (.timeout_map // {})) | to_entries[] | .key as $file | .value[] | {
       url: (.url | if startswith($prefix) then ltrimstr($prefix) else . end),
       status: .status.text,
-      file: $file,
+      file: ($file | ltrimstr($root) | sub("^(\\./+)+"; "")),
       line: .span.line,
     }
   ]
@@ -18,7 +18,7 @@ jq -c --arg prefix "file://${GITHUB_WORKSPACE}/" '
   | map({
       url: .[0].url,
       status: .[0].status,
-      refs: (map({file, line}) | unique | map("\(.file):\(.line // "?")")),
+      refs: (map({file, line}) | unique),
     })
   | .[]
 ' "${REPORT}" >"${records}"

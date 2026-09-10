@@ -17,8 +17,8 @@ blob_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/blob/${GITHUB_SHA}"
 reported_urls=$(mktemp)
 cut -f2 "${REPORTED}" >"${reported_urls}"
 
-substitute=$'\ufffd'
-autolink_pattern='^[a-zA-Z][a-zA-Z0-9+.-]*://[^[:space:]<>`]+$'
+substitute=$(printf '\xEF\xBF\xBD')
+autolink_pattern='^[a-zA-Z][a-zA-Z0-9+.-]{1,31}://[^[:space:][:cntrl:]<>]+$'
 
 # GitHub rejects a body longer than 65536 characters, which a link referenced from long paths can reach.
 body_limit=65536
@@ -38,19 +38,28 @@ write_body() {
     link="\`${url//\`/${substitute}}\`"
   fi
 
+  local present
+  present=$(jq -r --argjson limit "${refs_limit}" '[.refs[:$limit][].file] | unique[]' <<<"${record}" |
+    while IFS= read -r file; do
+      if [ "$(git -C "${GITHUB_WORKSPACE}" cat-file -t "${GITHUB_SHA}:${file}" 2>/dev/null)" = 'blob' ]; then
+        printf '%s\n' "${file}"
+      fi
+    done | jq -Rn '[inputs]')
+
   printf 'A link check with [lychee](https://github.com/lycheeverse/lychee) found this link to be unreachable.\n\n'
   printf '**Link:** %s\n' "${link}"
   printf '**Status:** %s\n\n' "\`${status//\`/${substitute}}\`"
   printf '**Referenced from:**\n\n'
-  jq -r --argjson limit "${refs_limit}" --argjson budget "${budget}" --arg blob "${blob_url}" '
+  jq -r --argjson limit "${refs_limit}" --argjson budget "${budget}" --argjson present "${present}" --arg blob "${blob_url}" '
     [
       .refs[:$limit][]
-      | (.file | gsub("[`[:cntrl:]]"; "\uFFFD")) as $name
+      | .file as $file
+      | ($file | gsub("[`[:cntrl:]]"; "\uFFFD")) as $name
       | (if .line then "\($name):\(.line)" else "\($name):?" end) as $text
-      | if (.file | test("^[a-zA-Z][a-zA-Z0-9+.-]*://")) then
+      | if ($present | index($file)) == null then
           "- `\($text)`"
         else
-          (.file | split("/") | map(@uri | gsub("\\("; "%28") | gsub("\\)"; "%29")) | join("/")) as $path
+          ($file | split("/") | map(@uri | gsub("\\("; "%28") | gsub("\\)"; "%29")) | join("/")) as $path
           | (if .line then "#L\(.line)" else "" end) as $fragment
           | "- [`\($text)`](\($blob)/\($path)\($fragment))"
         end

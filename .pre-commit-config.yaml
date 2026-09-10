@@ -26,6 +26,17 @@ repos:
       - id: yamllint
         args: ["--strict", "-c=.yamllint.yaml"]
 
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: 05c1426671b9237fb5e1444dd63aa5731bec0dfb  # frozen: v3.13.1-1
+    hooks:
+      - id: shfmt
+        args: ["-w", "-s", "-i", "2"]
+
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: 99470f5e12208ff0fb17ab81c3c494f7620a1d8d  # frozen: v0.11.0
+    hooks:
+      - id: shellcheck
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c  # frozen: v6.0.0
     hooks:

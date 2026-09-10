@@ -17,6 +17,9 @@ blob_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/blob/${GITHUB_SHA}"
 reported_urls=$(mktemp)
 cut -f2 "${REPORTED}" >"${reported_urls}"
 
+substitute=$'\ufffd'
+autolink_pattern='^[a-zA-Z][a-zA-Z0-9+.-]*://[^[:space:]<>`]+$'
+
 # GitHub rejects a body longer than 65536 characters, which a link referenced from long paths can reach.
 body_limit=65536
 body_overhead=1024
@@ -28,10 +31,17 @@ write_body() {
   local status=$3
   local budget=$4
 
-  printf 'A link check found this link to be unreachable.\n\n'
-  printf -- '- URL: %s\n' "${url}"
-  printf -- '- Status: %s\n\n' "${status}"
-  printf 'Referenced from:\n\n'
+  local link
+  if [[ ${url} =~ ${autolink_pattern} ]]; then
+    link="<${url}>"
+  else
+    link="\`${url//\`/${substitute}}\`"
+  fi
+
+  printf 'A link check with [lychee](https://github.com/lycheeverse/lychee) found this link to be unreachable.\n\n'
+  printf '**Link:** %s\n' "${link}"
+  printf '**Status:** %s\n\n' "\`${status//\`/${substitute}}\`"
+  printf '**Referenced from:**\n\n'
   jq -r --argjson limit "${refs_limit}" --argjson budget "${budget}" --arg blob "${blob_url}" '
     [
       .refs[:$limit][]

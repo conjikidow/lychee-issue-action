@@ -1,0 +1,100 @@
+name: 'Lychee Issue Action'
+description: 'Open one GitHub issue per unreachable link found by lychee, and close the issues whose links recover.'
+author: 'conjikidow'
+
+inputs:
+  report:
+    description: 'Path to the report lychee wrote with `--format json`.'
+    default: 'lychee/out.json'
+    required: false
+  label:
+    description: 'Label carried by every issue this action opens, and the key it looks them up by.'
+    default: 'links'
+    required: false
+  extra-labels:
+    description: 'Further labels to apply on creation, separated by commas. Not used for lookup.'
+    default: ''
+    required: false
+  title-prefix:
+    description: 'Text placed before the URL in the issue title.'
+    default: 'docs: fix broken link'
+    required: false
+  token:
+    description: 'Token used to read and write issues. Needs `issues: write`.'
+    default: ${{ github.token }}
+    required: false
+
+outputs:
+  broken:
+    description: 'Number of unreachable links in the report.'
+    value: ${{ steps.collect.outputs.broken }}
+  created:
+    description: 'Number of issues opened by this run.'
+    value: ${{ steps.create.outputs.created }}
+  closed:
+    description: 'Number of issues closed by this run.'
+    value: ${{ steps.close.outputs.closed }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Validate inputs
+      id: validate
+      shell: bash
+      env:
+        REPORT: ${{ inputs.report }}
+        LABEL: ${{ inputs.label }}
+      run: bash "${{ github.action_path }}/src/validate-inputs.sh"
+
+    - name: Collect broken links
+      id: collect
+      shell: bash
+      env:
+        REPORT: ${{ inputs.report }}
+      run: bash "${{ github.action_path }}/src/collect-broken-links.sh"
+
+    - name: List the issues already reported
+      id: reported
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        GH_REPO: ${{ github.repository }}
+        LABEL: ${{ steps.validate.outputs.label }}
+      run: bash "${{ github.action_path }}/src/list-reported-issues.sh"
+
+    - name: Create the labels that do not exist yet
+      if: steps.collect.outputs.broken != '0'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        GH_REPO: ${{ github.repository }}
+        LABEL: ${{ steps.validate.outputs.label }}
+        EXTRA_LABELS: ${{ inputs.extra-labels }}
+      run: bash "${{ github.action_path }}/src/ensure-labels.sh"
+
+    - name: Open issues for the newly broken links
+      id: create
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        GH_REPO: ${{ github.repository }}
+        RECORDS: ${{ steps.collect.outputs.records }}
+        REPORTED: ${{ steps.reported.outputs.reported }}
+        LABEL: ${{ steps.validate.outputs.label }}
+        EXTRA_LABELS: ${{ inputs.extra-labels }}
+        TITLE_PREFIX: ${{ inputs.title-prefix }}
+      run: bash "${{ github.action_path }}/src/create-issues.sh"
+
+    - name: Close the issues whose links recovered
+      id: close
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        GH_REPO: ${{ github.repository }}
+        RECORDS: ${{ steps.collect.outputs.records }}
+        REPORTED: ${{ steps.reported.outputs.reported }}
+      run: bash "${{ github.action_path }}/src/close-issues.sh"
+
+branding:
+  icon: 'link'
+  color: 'red'

@@ -121,6 +121,14 @@ pass an installation token to `token`.
 > Removing it from a body makes the action treat that link as unreported and open a second issue.
 > A closed issue is never reopened either: when a link breaks again, the action opens a new issue for it.
 
+## License
+
+Licensed under either of [MIT license](LICENSE-MIT) or [Apache License, Version 2.0](LICENSE-APACHE) at your option.
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in this software
+by you, as defined in the Apache-2.0 license, shall be dually licensed as above,
+without any additional terms or conditions.
+
 ## Contributing & Feedback
 
 Contributions, bug reports, and feedback are always welcome!

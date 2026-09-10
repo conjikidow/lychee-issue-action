@@ -10,11 +10,16 @@ jq -c --arg prefix "file://${GITHUB_WORKSPACE}/" '
     ((.error_map // {}), (.timeout_map // {})) | to_entries[] | .key as $file | .value[] | {
       url: (.url | if startswith($prefix) then ltrimstr($prefix) else . end),
       status: .status.text,
-      ref: "\($file):\(.span.line // "?")",
+      file: $file,
+      line: .span.line,
     }
   ]
   | group_by(.url)
-  | map({url: .[0].url, status: .[0].status, refs: (map(.ref) | unique)})
+  | map({
+      url: .[0].url,
+      status: .[0].status,
+      refs: (map({file, line}) | unique | map("\(.file):\(.line // "?")")),
+    })
   | .[]
 ' "${REPORT}" >"${records}"
 

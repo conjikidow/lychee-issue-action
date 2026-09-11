@@ -8,7 +8,7 @@ inputs:
     default: 'lychee/out.json'
     required: false
   label:
-    description: 'Label carried by every issue this action opens, and the key it looks them up by.'
+    description: 'Label carried by every issue the action opens, and the key it looks them up by.'
     default: 'links'
     required: false
   extra-labels:
@@ -20,7 +20,7 @@ inputs:
     default: 'docs: fix broken link'
     required: false
   token:
-    description: 'Token used to read and write issues. Needs `issues: write`.'
+    description: 'Token used to authenticate with GitHub. Needs `issues: write`.'
     default: ${{ github.token }}
     required: false
 

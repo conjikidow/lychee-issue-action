@@ -77,13 +77,13 @@ Releases of this action are immutable, so its own tags are already locked to a s
 
 ### Inputs
 
-| Name           | Description                                                            | Required | Default                   |
-| -------------- | ---------------------------------------------------------------------- | -------- | ------------------------- |
-| `report`       | Path to the report lychee wrote with `--format json`.                  | No       | `'lychee/out.json'`       |
-| `label`        | Label carried by every issue, and the key the action looks them up by. | No       | `'links'`                 |
-| `extra-labels` | Further labels to apply on creation, separated by commas.              | No       | `''`                      |
-| `title-prefix` | Text placed before the link in the issue title.                        | No       | `'docs: fix broken link'` |
-| `token`        | Token used to read and write issues.                                   | No       | `${{ github.token }}`     |
+| Name           | Description                                                                     | Required | Default                   |
+| -------------- | ------------------------------------------------------------------------------- | -------- | ------------------------- |
+| `report`       | Path to the report lychee wrote with `--format json`.                           | No       | `'lychee/out.json'`       |
+| `label`        | Label carried by every issue the action opens, and the key it looks them up by. | No       | `'links'`                 |
+| `extra-labels` | Further labels to apply on creation, separated by commas. Not used for lookup.  | No       | `''`                      |
+| `title-prefix` | Text placed before the link in the issue title.                                 | No       | `'docs: fix broken link'` |
+| `token`        | Token used to authenticate with GitHub.                                         | No       | `${{ github.token }}`     |
 
 ### Outputs
 

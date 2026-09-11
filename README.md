@@ -75,6 +75,18 @@ For production workflows, consider pinning each action to a full-length commit S
 as [GitHub recommends](https://docs.github.com/en/actions/reference/security/secure-use#using-third-party-actions).
 Releases of this action are immutable, so its own tags are already locked to a single commit.
 
+### Permissions
+
+The token passed to `github-token` needs `issues: write` to open and close the issues,
+and to create the labels it applies.
+
+The default `${{ github.token }}` carries whatever the workflow grants it,
+so grant that scope in the job, as the example above does.
+The `contents: read` there is for the checkout step, not for this action.
+
+The `permissions:` block does not reach a token you pass yourself.
+A GitHub App installation token needs the same access granted to the app itself.
+
 ### Inputs
 
 | Name           | Description                                                                     | Required | Default                   |
@@ -107,13 +119,6 @@ Define them in the repository beforehand if you do not want the action to create
 > Changing `label` after the first run hides the issues opened under the previous one.
 > They are no longer closed when their links recover, and a second issue is opened for every link still broken.
 > Changing `extra-labels` affects newly opened issues only.
-
-### Permissions
-
-The token needs `issues: write` to open and close issues and to create the missing labels.
-`contents: read` is for the checkout step, not for this action.
-To open the issues as a GitHub App instead of `github-actions[bot]`,
-pass an installation token to `github-token`.
 
 ## How It Works
 

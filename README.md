@@ -1,5 +1,11 @@
 # Lychee Issue Action
 
+[![Marketplace](https://img.shields.io/badge/Marketplace-Lychee_Issue_Action-2088FF.svg?style=flat&logo=githubactions&logoColor=white)](https://github.com/marketplace/actions/lychee-issue-action)
+[![Release](https://img.shields.io/github/v/release/conjikidow/lychee-issue-action?style=flat&logo=github&logoColor=white&label=release)](https://github.com/conjikidow/lychee-issue-action/releases/latest)
+[![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg?style=flat)](#license)
+[![prek](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/j178/prek/master/docs/assets/badge-v0.json)](https://github.com/j178/prek)
+[![CI](https://github.com/conjikidow/lychee-issue-action/actions/workflows/ci.yaml/badge.svg)](https://github.com/conjikidow/lychee-issue-action/actions/workflows/ci.yaml)
+
 A GitHub Action to track the broken links found by [lychee](https://github.com/lycheeverse/lychee) as GitHub issues.
 
 > [!WARNING]

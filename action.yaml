@@ -1,5 +1,5 @@
 name: 'Lychee Issue Action'
-description: 'Open one GitHub issue per unreachable link found by lychee, and close the issues whose links recover.'
+description: 'Track the broken links found by lychee as GitHub issues'
 author: 'conjikidow'
 
 inputs:

@@ -16,7 +16,7 @@ inputs:
     default: ''
     required: false
   title-prefix:
-    description: 'Text placed before the URL in the issue title.'
+    description: 'Text placed before the link in the issue title.'
     default: 'docs: fix broken link'
     required: false
   token:

@@ -71,21 +71,21 @@ Releases of this action are immutable, so its own tags are already locked to a s
 
 ### Inputs
 
-| Name           | Description                                                              | Required | Default                 |
-| -------------- | ------------------------------------------------------------------------ | -------- | ----------------------- |
-| `report`       | Path to the report lychee wrote with `--format json`.                    | No       | `'lychee/out.json'`     |
-| `label`        | Label carried by every issue, and the key the action looks them up by.   | No       | `'links'`               |
-| `extra-labels` | Further labels to apply on creation, separated by commas.                | No       | `''`                    |
-| `title-prefix` | Text placed before the link in the issue title.                          | No       | `'docs: fix broken link'` |
-| `token`        | Token used to read and write issues.                                     | No       | `${{ github.token }}`   |
+| Name           | Description                                                            | Required | Default                   |
+| -------------- | ---------------------------------------------------------------------- | -------- | ------------------------- |
+| `report`       | Path to the report lychee wrote with `--format json`.                  | No       | `'lychee/out.json'`       |
+| `label`        | Label carried by every issue, and the key the action looks them up by. | No       | `'links'`                 |
+| `extra-labels` | Further labels to apply on creation, separated by commas.              | No       | `''`                      |
+| `title-prefix` | Text placed before the link in the issue title.                        | No       | `'docs: fix broken link'` |
+| `token`        | Token used to read and write issues.                                   | No       | `${{ github.token }}`     |
 
 ### Outputs
 
-| Name      | Description                                  |
-| --------- | -------------------------------------------- |
-| `broken`  | Number of unreachable links in the report.   |
-| `created` | Number of issues opened by this run.         |
-| `closed`  | Number of issues closed by this run.         |
+| Name      | Description                                |
+| --------- | ------------------------------------------ |
+| `broken`  | Number of unreachable links in the report. |
+| `created` | Number of issues opened by this run.       |
+| `closed`  | Number of issues closed by this run.       |
 
 ### Labels
 

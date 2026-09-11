@@ -5,24 +5,24 @@ author: 'conjikidow'
 inputs:
   report:
     description: 'Path to the report lychee wrote with `--format json`.'
-    default: 'lychee/out.json'
     required: false
+    default: 'lychee/out.json'
   label:
     description: 'Label carried by every issue the action opens, and the key it looks them up by.'
-    default: 'links'
     required: false
+    default: 'links'
   extra-labels:
     description: 'Further labels to apply on creation, separated by commas. Not used for lookup.'
-    default: ''
     required: false
+    default: ''
   title-prefix:
     description: 'Text placed before the link in the issue title.'
-    default: 'docs: fix broken link'
     required: false
+    default: 'docs: fix broken link'
   github-token:
     description: 'Token used to authenticate with GitHub. Needs `issues: write`.'
-    default: ${{ github.token }}
     required: false
+    default: ${{ github.token }}
 
 outputs:
   broken:

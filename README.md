@@ -83,7 +83,7 @@ Releases of this action are immutable, so its own tags are already locked to a s
 | `label`        | Label carried by every issue the action opens, and the key it looks them up by. | No       | `'links'`                 |
 | `extra-labels` | Further labels to apply on creation, separated by commas. Not used for lookup.  | No       | `''`                      |
 | `title-prefix` | Text placed before the link in the issue title.                                 | No       | `'docs: fix broken link'` |
-| `token`        | Token used to authenticate with GitHub.                                         | No       | `${{ github.token }}`     |
+| `github-token` | Token used to authenticate with GitHub.                                         | No       | `${{ github.token }}`     |
 
 ### Outputs
 
@@ -113,7 +113,7 @@ Define them in the repository beforehand if you do not want the action to create
 The token needs `issues: write` to open and close issues and to create the missing labels.
 `contents: read` is for the checkout step, not for this action.
 To open the issues as a GitHub App instead of `github-actions[bot]`,
-pass an installation token to `token`.
+pass an installation token to `github-token`.
 
 ## How It Works
 

@@ -401,7 +401,7 @@ jobs:
 
       - name: Run shellcheck (reviewdog)
         if: github.event_name == 'pull_request' && steps.shell-files.outputs.found == 'true'
-        uses: reviewdog/action-shellcheck@0722bbdb0d47f04c1b53b8734d2422ac63a45ec6 # v1.32.1
+        uses: reviewdog/action-shellcheck@a94d585085f1f5215ae65f4de34e7bbd0523d550 # v1.33.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review

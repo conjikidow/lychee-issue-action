@@ -63,19 +63,6 @@
       managerFilePatterns: [
         '/^\\.github/workflows/ci\\.ya?ml$/',
       ],
-      matchStringsStrategy: 'recursive',
-      matchStrings: [
-        "uses: reviewdog/action-setup@[a-f0-9]{40}[^\\n]*\\n(?:\\s+with:\\n(?:\\s+[^\\n]+\\n)*?)\\s+reviewdog_version: '[^'\\s]+'",
-        "\\n\\s+reviewdog_version: '(?<currentValue>[^'\\s]+)'",
-      ],
-      datasourceTemplate: 'github-releases',
-      depNameTemplate: 'reviewdog/reviewdog',
-    },
-    {
-      customType: 'regex',
-      managerFilePatterns: [
-        '/^\\.github/workflows/ci\\.ya?ml$/',
-      ],
       matchStrings: [
         'json5@(?<currentValue>\\S+)',
       ],
@@ -107,19 +94,6 @@
       datasourceTemplate: 'pypi',
       depNameTemplate: 'adrienverge/yamllint',
       packageNameTemplate: 'yamllint',
-    },
-    {
-      customType: 'regex',
-      managerFilePatterns: [
-        '/^\\.github/workflows/ci\\.ya?ml$/',
-      ],
-      matchStringsStrategy: 'recursive',
-      matchStrings: [
-        "uses: j178/prek-action@[a-f0-9]{40}[^\\n]*\\n(?:\\s+with:\\n(?:\\s+[^\\n]+\\n)*?)\\s+prek-version: '[^'\\s]+'",
-        "\\n\\s+prek-version: '(?<currentValue>[^'\\s]+)'",
-      ],
-      datasourceTemplate: 'github-releases',
-      depNameTemplate: 'j178/prek',
     },
   ],
   packageRules: [

@@ -19,6 +19,8 @@ A GitHub Action to track the broken links found by [lychee](https://github.com/l
 
 ## Usage
 
+The action requires `gh` and `jq`, which the GitHub-hosted runner images provide.
+
 ### Workflow Example
 
 The link check itself is left to [`lychee-action`](https://github.com/lycheeverse/lychee-action),
@@ -67,8 +69,6 @@ Three of the `lychee-action` inputs above are not optional for this setup.
 
 The `concurrency` group serializes the runs: two overlapping runs would both see the same set of open issues,
 and both would open an issue for the same link.
-
-This action shells out to `gh` and `jq`, which the GitHub-hosted runner images provide.
 
 The example references actions by tag for readability.
 For production workflows, consider pinning each action to a full-length commit SHA,

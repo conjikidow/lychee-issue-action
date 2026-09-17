@@ -7,7 +7,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 require_cmd gh
 require_cmd jq
 
-broken_urls=$(mktemp)
+broken_urls="$(mktemp)"
 jq -r '.url' "${RECORDS}" >"${broken_urls}"
 
 closed=0
@@ -18,7 +18,7 @@ while IFS=$'\t' read -r number url <&3; do
   fi
 
   gh issue close "${number}" --comment 'This link is reachable again.'
-  closed=$((closed + 1))
+  closed="$((closed + 1))"
   pace_mutation
 done 3<"${REPORTED}"
 

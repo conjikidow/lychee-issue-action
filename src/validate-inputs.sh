@@ -15,7 +15,7 @@ if [[ ${LABEL} == *,* || ${LABEL} == *$'\n'* ]]; then
   exit 1
 fi
 
-normalized=$(split_labels "${LABEL}")
+normalized="$(split_labels "${LABEL}")"
 if [ -z "${normalized}" ]; then
   log_error 'The label input must not be empty.'
   exit 1

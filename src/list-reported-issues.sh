@@ -9,7 +9,7 @@ require_cmd jq
 
 limit=1000
 
-listing=$(mktemp)
+listing="$(mktemp)"
 gh issue list --label "$(csv_field "${LABEL}")" --state open --limit "${limit}" --json number,body >"${listing}"
 
 if [ "$(jq 'length' "${listing}")" -ge "${limit}" ]; then
@@ -17,7 +17,7 @@ if [ "$(jq 'length' "${listing}")" -ge "${limit}" ]; then
 fi
 
 # The action writes its marker at the end of the body, so the last one wins.
-reported=$(mktemp)
+reported="$(mktemp)"
 jq -r '.[]
   | [.number, ([.body | scan("<!-- lychee: (.*?) -->")] | last | .[0]? // empty | gsub("^\\s+|\\s+$"; ""))]
   | select(length == 2 and (.[1] | length > 0))

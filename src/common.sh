@@ -10,7 +10,7 @@ log_error() {
 }
 
 require_cmd() {
-  local cmd=$1
+  local cmd="$1"
   if ! command -v "${cmd}" >/dev/null 2>&1; then
     log_error "Required command not found: ${cmd}. Install it on the runner to use this action."
     exit 1
@@ -18,8 +18,8 @@ require_cmd() {
 }
 
 write_output() {
-  local key=$1
-  local value=$2
+  local key="$1"
+  local value="$2"
   echo "${key}=${value}" >>"${GITHUB_OUTPUT}"
 }
 
@@ -30,12 +30,12 @@ pace_mutation() {
 
 # `gh --label` parses its value as CSV, so a name carrying a quote or a comma has to be handed over as one CSV field.
 csv_field() {
-  local value=$1
+  local value="$1"
   printf '"%s"' "${value//\"/\"\"}"
 }
 
 split_labels() {
-  local raw=$1
+  local raw="$1"
   local -a names
   local name
 
@@ -43,8 +43,8 @@ split_labels() {
   IFS=',' read -ra names <<<"${raw//$'\n'/,}"
   for name in "${names[@]}"; do
     # Only the padding around a name is dropped: 'help wanted' is a single label, not two.
-    name=${name#"${name%%[![:space:]]*}"}
-    name=${name%"${name##*[![:space:]]}"}
+    name="${name#"${name%%[![:space:]]*}"}"
+    name="${name%"${name##*[![:space:]]}"}"
     if [ -n "${name}" ]; then
       printf '%s\n' "${name}"
     fi

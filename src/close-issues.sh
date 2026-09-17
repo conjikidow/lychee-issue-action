@@ -4,6 +4,9 @@ set -euo pipefail
 # shellcheck disable=SC1091
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
+require_cmd gh
+require_cmd jq
+
 broken_urls=$(mktemp)
 jq -r '.url' "${RECORDS}" >"${broken_urls}"
 

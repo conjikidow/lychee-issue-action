@@ -4,6 +4,9 @@ set -euo pipefail
 # shellcheck disable=SC1091
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
+require_cmd gh
+require_cmd jq
+
 label_args=()
 while IFS= read -r name <&3; do
   label_args+=(--label "$(csv_field "${name}")")

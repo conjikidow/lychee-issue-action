@@ -4,6 +4,8 @@ set -euo pipefail
 # shellcheck disable=SC1091
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
+require_cmd jq
+
 records=$(mktemp)
 jq -c --arg prefix "file://${GITHUB_WORKSPACE}/" --arg root "${GITHUB_WORKSPACE}/" '
   [

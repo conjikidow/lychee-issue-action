@@ -36,7 +36,7 @@ jobs:
         uses: commitizen-tools/setup-cz@96c75e6ae9632047f2c9b4025b9dd1624b40de8f # v0.9.1
         with:
           python-version: '3.x'
-          version: '4.18.1'
+          version: '4.19.0'
 
       - name: Lint pull request title
         env:

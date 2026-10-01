@@ -1,4 +1,4 @@
-name: Bump Version
+name: Bump version
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
       - closed
   workflow_dispatch:
     inputs:
-      bump_type:
+      bump-type:
         description: 'Version bump type'
         required: true
         type: choice
@@ -19,6 +19,7 @@ permissions: {}
 
 jobs:
   bump-version:
+    name: Bump version
     if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -39,7 +40,7 @@ jobs:
           label-major: 'update::major'
           label-minor: 'update::minor'
           label-patch: 'update::patch'
-          manual-bump-type: ${{ inputs.bump_type }}
+          manual-bump-type: ${{ inputs.bump-type }}
           labels-to-add: 'automated,versioning'
           create-release: 'true'
           github-token: ${{ steps.app-token.outputs.token }}

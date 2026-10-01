@@ -19,17 +19,17 @@ permissions:
 
 jobs:
   determine-changes:
-    name: Determine changed files
+    name: Determine changes
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
-      github_actions: ${{ steps.changed-files.outputs.github_actions_any_changed }}
-      github_actions_ci: ${{ steps.changed-files.outputs.github_actions_ci_any_changed }}
-      pre_commit_config: ${{ steps.changed-files.outputs.pre_commit_config_any_changed }}
-      renovate_config: ${{ steps.changed-files.outputs.renovate_config_any_changed }}
+      github-actions: ${{ steps.changed-files.outputs.github_actions_any_changed }}
+      github-actions-ci: ${{ steps.changed-files.outputs.github_actions_ci_any_changed }}
+      pre-commit-config: ${{ steps.changed-files.outputs.pre_commit_config_any_changed }}
+      renovate-config: ${{ steps.changed-files.outputs.renovate_config_any_changed }}
       md: ${{ steps.changed-files.outputs.md_any_changed }}
       json5: ${{ steps.changed-files.outputs.json5_any_changed }}
-      json5_files: ${{ steps.changed-files.outputs.json5_all_changed_files }}
+      json5-files: ${{ steps.changed-files.outputs.json5_all_changed_files }}
       toml: ${{ steps.changed-files.outputs.toml_any_changed }}
       yaml: ${{ steps.changed-files.outputs.yaml_any_changed }}
       shell: ${{ steps.changed-files.outputs.shell_any_changed }}
@@ -71,10 +71,10 @@ jobs:
             shell:
               - '**/*.sh'
 
-  lint-gh-actions:
+  lint-github-actions:
     name: Lint GitHub Actions
     needs: determine-changes
-    if: ${{ needs.determine-changes.outputs.github_actions == 'true' }}
+    if: ${{ needs.determine-changes.outputs.github-actions == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -87,13 +87,13 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Run actionlint
+      - name: Lint GitHub Actions
         if: github.event_name != 'pull_request'
         run: |
           go install github.com/rhysd/actionlint/cmd/actionlint@914e7df21a07ef503a81201c76d2b11c789d3fca # v1.7.12
           "$(go env GOPATH)/bin/actionlint" -color
 
-      - name: Run actionlint (reviewdog)
+      - name: Lint GitHub Actions (reviewdog)
         if: github.event_name == 'pull_request'
         uses: reviewdog/action-actionlint@8b682e1e7e512151d73a6b9449cbff173846226e # v1.74.0
         with:
@@ -106,8 +106,8 @@ jobs:
     name: Audit with zizmor
     needs: determine-changes
     if: >-
-      ${{ needs.determine-changes.outputs.github_actions == 'true' ||
-      needs.determine-changes.outputs.pre_commit_config == 'true' }}
+      ${{ needs.determine-changes.outputs.github-actions == 'true' ||
+      needs.determine-changes.outputs.pre-commit-config == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -120,14 +120,14 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Run zizmor
+      - name: Audit with zizmor
         uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
         with:
           version: 'v1.30.1'
           advanced-security: false
           annotations: true
 
-      - name: Run zizmor (SARIF upload)
+      - name: Audit with zizmor (SARIF upload)
         if: >-
           ${{
             always() &&
@@ -144,8 +144,8 @@ jobs:
     name: Validate Renovate config
     needs: determine-changes
     if: >-
-      ${{ needs.determine-changes.outputs.renovate_config == 'true' ||
-      needs.determine-changes.outputs.github_actions_ci == 'true' }}
+      ${{ needs.determine-changes.outputs.renovate-config == 'true' ||
+      needs.determine-changes.outputs.github-actions-ci == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -157,7 +157,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Node.js
+      - name: Install Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
@@ -172,7 +172,7 @@ jobs:
     needs: determine-changes
     if: >-
       ${{ needs.determine-changes.outputs.md == 'true' ||
-      needs.determine-changes.outputs.github_actions_ci == 'true' }}
+      needs.determine-changes.outputs.github-actions-ci == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -190,12 +190,12 @@ jobs:
           version: '0.2.77'
           report-type: annotations
 
-  lint-json5:
-    name: Lint JSON5
+  validate-json5:
+    name: Validate JSON5
     needs: determine-changes
     if: >-
       ${{ needs.determine-changes.outputs.json5 == 'true' ||
-      needs.determine-changes.outputs.github_actions_ci == 'true' }}
+      needs.determine-changes.outputs.github-actions-ci == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -207,9 +207,9 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Check JSON5 syntax
+      - name: Validate JSON5
         env:
-          CHANGED_JSON5_FILES: ${{ needs.determine-changes.outputs.json5_files }}
+          CHANGED_JSON5_FILES: ${{ needs.determine-changes.outputs.json5-files }}
         run: |
           readarray -t json5_files < <(
             printf '%s\n' "${CHANGED_JSON5_FILES}" | sed '/^$/d'
@@ -234,7 +234,7 @@ jobs:
     needs: determine-changes
     if: >-
       ${{ needs.determine-changes.outputs.toml == 'true' ||
-      needs.determine-changes.outputs.github_actions_ci == 'true' }}
+      needs.determine-changes.outputs.github-actions-ci == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -256,7 +256,7 @@ jobs:
         if: github.event_name != 'pull_request'
         run: tombi lint
 
-      - name: Set up reviewdog
+      - name: Install reviewdog
         if: github.event_name == 'pull_request'
         uses: reviewdog/action-setup@d8a7baabd7f3e8544ee4dbde3ee41d0011c3a93f # v1.5.0
         with:
@@ -295,7 +295,7 @@ jobs:
       - name: Format TOML
         run: tombi format
 
-      - name: Suggest TOML format changes (reviewdog)
+      - name: Suggest TOML formatting
         if: github.event_name == 'pull_request'
         uses: reviewdog/action-suggester@c387862ad6765a9729f2b40ee4d8b5769f2145c7 # v1.26.1
         with:
@@ -303,7 +303,7 @@ jobs:
           tool_name: tombi-format
           cleanup: 'false'
 
-      - name: Check TOML format
+      - name: Check TOML formatting
         run: git diff --exit-code
 
   lint-yaml:
@@ -311,7 +311,7 @@ jobs:
     needs: determine-changes
     if: >-
       ${{ needs.determine-changes.outputs.yaml == 'true' ||
-      needs.determine-changes.outputs.github_actions_ci == 'true' }}
+      needs.determine-changes.outputs.github-actions-ci == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -345,11 +345,11 @@ jobs:
           yamllint_flags: .
 
   lint-shell-scripts:
-    name: Lint Shell Scripts
+    name: Lint shell scripts
     needs: determine-changes
     if: >-
       ${{ needs.determine-changes.outputs.shell == 'true' ||
-      needs.determine-changes.outputs.github_actions_ci == 'true' }}
+      needs.determine-changes.outputs.github-actions-ci == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -372,12 +372,12 @@ jobs:
           fi
 
       - name: Collect shell scripts
-        id: shell-files
+        id: shell-scripts
         shell: bash
         run: |
           shell_files_path="$(mktemp)"
           find . -type f -name '*.sh' -not -path './.git/*' -print0 > "${shell_files_path}"
-          echo "shell_files=${shell_files_path}" >> "$GITHUB_OUTPUT"
+          echo "files=${shell_files_path}" >> "$GITHUB_OUTPUT"
           if [ ! -s "${shell_files_path}" ]; then
             echo "No shell scripts found."
             echo "found=false" >> "$GITHUB_OUTPUT"
@@ -385,24 +385,24 @@ jobs:
             echo "found=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Run shfmt
-        if: steps.shell-files.outputs.found == 'true'
+      - name: Check shell script formatting
+        if: steps.shell-scripts.outputs.found == 'true'
         shell: bash
         env:
-          SHELL_FILES: ${{ steps.shell-files.outputs.shell_files }}
+          SHELL_FILES: ${{ steps.shell-scripts.outputs.files }}
         run: |
           xargs -0 shfmt --diff --simplify -i 2 < "${SHELL_FILES}"
 
-      - name: Run shellcheck
-        if: github.event_name != 'pull_request' && steps.shell-files.outputs.found == 'true'
+      - name: Lint shell scripts
+        if: github.event_name != 'pull_request' && steps.shell-scripts.outputs.found == 'true'
         shell: bash
         env:
-          SHELL_FILES: ${{ steps.shell-files.outputs.shell_files }}
+          SHELL_FILES: ${{ steps.shell-scripts.outputs.files }}
         run: |
           xargs -0 shellcheck --external-sources < "${SHELL_FILES}"
 
-      - name: Run shellcheck (reviewdog)
-        if: github.event_name == 'pull_request' && steps.shell-files.outputs.found == 'true'
+      - name: Lint shell scripts (reviewdog)
+        if: github.event_name == 'pull_request' && steps.shell-scripts.outputs.found == 'true'
         uses: reviewdog/action-shellcheck@0a90156c6e0553996a217f0a9e09be6b0f6bee4c # v1.34.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -410,8 +410,8 @@ jobs:
           filter_mode: nofilter
           fail_level: error
 
-  check-prek:
-    name: Check prek
+  run-prek-hooks:
+    name: Run prek hooks
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -421,14 +421,14 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Check prek
+      - name: Run prek hooks
         uses: j178/prek-action@4e14d07f9231acabce116ccfca13b13dd9755ece # v3.0.0
         with:
           prek-version: 'v0.5.4'
           extra-args: '--all-files --skip no-commit-to-branch'
 
-  check-typos:
-    name: Check typos
+  check-spelling:
+    name: Check spelling
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -468,24 +468,24 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Set up Commitizen
+      - name: Install Commitizen
         uses: commitizen-tools/setup-cz@96c75e6ae9632047f2c9b4025b9dd1624b40de8f # v0.9.1
         with:
           python-version: '3.x'
           version: '4.19.0'
 
-      - name: Lint commit messages on push
+      - name: Lint commit messages (push)
         if: github.event_name == 'push'
         env:
-          BEFORE_SHA: ${{ github.event.before }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
           HEAD_SHA: ${{ github.sha }}
         run: |
-          if ! git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+          if ! git cat-file -e "${PUSH_BEFORE_SHA}^{commit}" 2>/dev/null; then
             echo "::notice title=cz check::Base commit unavailable (new branch or force push); skipping lint."
             exit 0
           fi
-          cz check --rev-range "${BEFORE_SHA}..${HEAD_SHA}"
+          cz check --rev-range "${PUSH_BEFORE_SHA}..${HEAD_SHA}"
 
-      - name: Lint commit messages on pull request
+      - name: Lint commit messages (pull request)
         if: github.event_name == 'pull_request'
         run: cz check --rev-range ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}

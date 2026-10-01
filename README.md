@@ -99,11 +99,11 @@ A GitHub App installation token needs the same access granted to the app itself.
 
 ### Outputs
 
-| Name      | Description                                |
-| --------- | ------------------------------------------ |
-| `broken`  | Number of unreachable links in the report. |
-| `created` | Number of issues opened by this run.       |
-| `closed`  | Number of issues closed by this run.       |
+| Name     | Description                                |
+| -------- | ------------------------------------------ |
+| `broken` | Number of unreachable links in the report. |
+| `opened` | Number of issues opened by this run.       |
+| `closed` | Number of issues closed by this run.       |
 
 ### Labels
 

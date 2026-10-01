@@ -11,7 +11,7 @@ on:
       - '.github/labels/label-definition.yaml'
   push:
     branches:
-      - main
+      - 'main'
     paths:
       - '.github/workflows/sync-labels.yaml'
       - '.github/labels/label-definition.yaml'

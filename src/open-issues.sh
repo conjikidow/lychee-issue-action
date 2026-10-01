@@ -77,7 +77,7 @@ write_body() {
   printf '\n<!-- lychee: %s -->\n' "${url}"
 }
 
-created=0
+opened=0
 # The records are read on a dedicated descriptor so that gh keeps its own stdin.
 while IFS= read -r record <&3; do
   url="$(jq -r '.url' <<<"${record}")"
@@ -102,8 +102,8 @@ while IFS= read -r record <&3; do
   fi
 
   gh issue create --title "${title}" --body-file "${body}" "${label_args[@]}"
-  created="$((created + 1))"
+  opened="$((opened + 1))"
   pace_mutation
 done 3<"${RECORDS}"
 
-write_output 'created' "${created}"
+write_output 'opened' "${opened}"

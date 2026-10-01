@@ -28,9 +28,9 @@ outputs:
   broken:
     description: 'Number of unreachable links in the report.'
     value: ${{ steps.collect.outputs.broken }}
-  created:
+  opened:
     description: 'Number of issues opened by this run.'
-    value: ${{ steps.create.outputs.created }}
+    value: ${{ steps.open.outputs.opened }}
   closed:
     description: 'Number of issues closed by this run.'
     value: ${{ steps.close.outputs.closed }}
@@ -73,7 +73,7 @@ runs:
       run: bash "${{ github.action_path }}/src/ensure-labels.sh"
 
     - name: Open issues for the newly broken links
-      id: create
+      id: open
       shell: bash
       env:
         GH_TOKEN: ${{ inputs.github-token }}
@@ -83,7 +83,7 @@ runs:
         LABEL: ${{ steps.validate.outputs.label }}
         EXTRA_LABELS: ${{ inputs.extra-labels }}
         TITLE_PREFIX: ${{ inputs.title-prefix }}
-      run: bash "${{ github.action_path }}/src/create-issues.sh"
+      run: bash "${{ github.action_path }}/src/open-issues.sh"
 
     - name: Close the issues whose links recovered
       id: close

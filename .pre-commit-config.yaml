@@ -15,7 +15,7 @@ repos:
         args: ["--fix"]
 
   - repo: https://github.com/tombi-toml/tombi-pre-commit
-    rev: b5c820aff664ac92018905d023a7c7e9e25ed1e4  # frozen: v1.5.8
+    rev: fe66160f8d22f8eb390ac5e199a4d6f53169f7ea  # frozen: v1.6.1
     hooks:
       - id: tombi-format
       - id: tombi-lint

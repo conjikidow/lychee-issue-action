@@ -248,9 +248,9 @@ jobs:
           persist-credentials: false
 
       - name: Install Tombi
-        uses: tombi-toml/setup-tombi@5752de665c9258ec1f869c3498d02ce94b70205c # v1.5.8
+        uses: tombi-toml/setup-tombi@adc72e7b9a4c5fc8beac71a944c0cc52edbe06f5 # v1.6.1
         with:
-          version: '1.5.8'
+          version: '1.6.1'
 
       - name: Lint TOML
         if: github.event_name != 'pull_request'

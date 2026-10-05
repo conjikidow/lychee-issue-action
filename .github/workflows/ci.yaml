@@ -165,7 +165,7 @@ jobs:
           node-version: '24'
 
       - name: Validate Renovate config
-        run: npx --yes --package renovate@44.115.10 renovate-config-validator .github/renovate.json5
+        run: npx --yes --package renovate@44.132.2 renovate-config-validator .github/renovate.json5
 
   lint-markdown:
     name: Lint Markdown

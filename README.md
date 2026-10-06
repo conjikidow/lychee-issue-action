@@ -28,7 +28,7 @@ which writes the report this action reads.
 The following workflow checks the links every Monday and keeps one issue open per unreachable link.
 
 ```yaml
-name: Link Check
+name: Track broken links
 
 on:
   schedule:
@@ -39,19 +39,19 @@ concurrency:
   group: ${{ github.workflow }}
 
 jobs:
-  link-check:
+  track-broken-links:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       issues: write
 
     steps:
-      - name: Checkout the repository
+      - name: Checkout the main repository
         uses: actions/checkout@v7
         with:
           persist-credentials: false
 
-      - name: Check the links
+      - name: Find broken links
         uses: lycheeverse/lychee-action@v2
         with:
           format: json
@@ -91,8 +91,8 @@ A GitHub App installation token needs the same access granted to the app itself.
 
 | Name           | Description                                                                     | Required | Default                   |
 | -------------- | ------------------------------------------------------------------------------- | -------- | ------------------------- |
-| `report`       | Path to the report lychee wrote with `--format json`.                           | No       | `'lychee/out.json'`       |
-| `label`        | Label carried by every issue the action opens, and the key it looks them up by. | No       | `'links'`                 |
+| `report`       | Path to the report lychee wrote with `--format json`.                           | No       | `lychee/out.json`         |
+| `label`        | Label carried by every issue the action opens, and the key it looks them up by. | No       | `links`                   |
 | `extra-labels` | Further labels to apply on creation, separated by commas. Not used for lookup.  | No       | `''`                      |
 | `title-prefix` | Text placed before the link in the issue title.                                 | No       | `'docs: fix broken link'` |
 | `github-token` | Token used to authenticate with GitHub.                                         | No       | `${{ github.token }}`     |

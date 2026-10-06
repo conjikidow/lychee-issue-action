@@ -49,14 +49,14 @@ runs:
       env:
         REPORT: ${{ inputs.report }}
         LABEL: ${{ inputs.label }}
-      run: bash "${{ github.action_path }}/src/validate-inputs.sh"
+      run: bash "${GITHUB_ACTION_PATH}/src/validate-inputs.sh"
 
     - name: Collect broken links
       id: collect
       shell: bash
       env:
         REPORT: ${{ inputs.report }}
-      run: bash "${{ github.action_path }}/src/collect-broken-links.sh"
+      run: bash "${GITHUB_ACTION_PATH}/src/collect-broken-links.sh"
 
     - name: List the issues already reported
       id: reported
@@ -65,7 +65,7 @@ runs:
         GH_TOKEN: ${{ inputs.github-token }}
         GH_REPO: ${{ github.repository }}
         LABEL: ${{ steps.validate.outputs.label }}
-      run: bash "${{ github.action_path }}/src/list-reported-issues.sh"
+      run: bash "${GITHUB_ACTION_PATH}/src/list-reported-issues.sh"
 
     - name: Create the labels that do not exist yet
       if: steps.collect.outputs.broken != '0'
@@ -75,7 +75,7 @@ runs:
         GH_REPO: ${{ github.repository }}
         EXTRA_LABELS: ${{ inputs.extra-labels }}
         LABEL: ${{ steps.validate.outputs.label }}
-      run: bash "${{ github.action_path }}/src/ensure-labels.sh"
+      run: bash "${GITHUB_ACTION_PATH}/src/ensure-labels.sh"
 
     - name: Open issues for the newly broken links
       id: open
@@ -88,7 +88,7 @@ runs:
         LABEL: ${{ steps.validate.outputs.label }}
         RECORDS: ${{ steps.collect.outputs.records }}
         REPORTED: ${{ steps.reported.outputs.reported }}
-      run: bash "${{ github.action_path }}/src/open-issues.sh"
+      run: bash "${GITHUB_ACTION_PATH}/src/open-issues.sh"
 
     - name: Close the issues whose links recovered
       id: close
@@ -98,4 +98,4 @@ runs:
         GH_REPO: ${{ github.repository }}
         RECORDS: ${{ steps.collect.outputs.records }}
         REPORTED: ${{ steps.reported.outputs.reported }}
-      run: bash "${{ github.action_path }}/src/close-issues.sh"
+      run: bash "${GITHUB_ACTION_PATH}/src/close-issues.sh"

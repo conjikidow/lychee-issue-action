@@ -46,7 +46,7 @@ jobs:
       issues: write
 
     steps:
-      - name: Checkout the main repository
+      - name: Check out the repository
         uses: actions/checkout@v7
         with:
           persist-credentials: false

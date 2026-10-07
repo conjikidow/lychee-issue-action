@@ -95,7 +95,7 @@ A GitHub App installation token needs the same access granted to the app itself.
 | `label`        | Label carried by every issue the action opens, and the key it looks them up by. | No       | `links`                   |
 | `extra-labels` | Further labels to apply on creation, separated by commas. Not used for lookup.  | No       | `''`                      |
 | `title-prefix` | Text placed before the link in the issue title.                                 | No       | `'docs: fix broken link'` |
-| `github-token` | Token used to authenticate with GitHub.                                         | No       | `${{ github.token }}`     |
+| `github-token` | Token used to authenticate with GitHub. Needs `issues: write`.                  | No       | `${{ github.token }}`     |
 
 ### Outputs
 

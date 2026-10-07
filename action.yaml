@@ -58,7 +58,7 @@ runs:
         REPORT: ${{ inputs.report }}
       run: bash "${GITHUB_ACTION_PATH}/src/collect-broken-links.sh"
 
-    - name: List the issues already reported
+    - name: List the reported issues
       id: reported
       shell: bash
       env:
@@ -67,7 +67,7 @@ runs:
         LABEL: ${{ steps.validate.outputs.label }}
       run: bash "${GITHUB_ACTION_PATH}/src/list-reported-issues.sh"
 
-    - name: Create the labels that do not exist yet
+    - name: Create the missing labels
       if: steps.collect.outputs.broken != '0'
       shell: bash
       env:
@@ -75,7 +75,7 @@ runs:
         GH_REPO: ${{ github.repository }}
         EXTRA_LABELS: ${{ inputs.extra-labels }}
         LABEL: ${{ steps.validate.outputs.label }}
-      run: bash "${GITHUB_ACTION_PATH}/src/ensure-labels.sh"
+      run: bash "${GITHUB_ACTION_PATH}/src/create-missing-labels.sh"
 
     - name: Open issues for the newly broken links
       id: open

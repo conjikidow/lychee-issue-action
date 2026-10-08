@@ -244,7 +244,7 @@ jobs:
           version: '1.7.2'
 
       - name: Lint TOML
-        run: tombi lint --diagnostics-format github
+        run: tombi lint --error-on-warnings --diagnostics-format github
 
   format-toml:
     name: Format TOML
@@ -310,7 +310,7 @@ jobs:
           version: '0.12.23'
 
       - name: Lint YAML
-        run: git ls-files -z '*.yaml' '*.yml' | xargs -0 uvx --from "yamllint==1.38.0" yamllint --format github
+        run: git ls-files -z '*.yaml' '*.yml' | xargs -0 uvx --from "yamllint==1.38.0" yamllint --format github --strict
 
   lint-shell-scripts:
     name: Lint shell scripts

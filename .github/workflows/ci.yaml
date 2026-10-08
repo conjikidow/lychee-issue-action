@@ -337,7 +337,7 @@ jobs:
       - name: Lint shell scripts
         run: |
           echo "::add-matcher::.github/shellcheck-matcher.json"
-          git ls-files -z '*.sh' | xargs -0 shellcheck --format gcc --external-sources
+          git ls-files -z '*.sh' | xargs -0 -r shellcheck --format gcc --external-sources
 
   format-shell-scripts:
     name: Format shell scripts
@@ -363,7 +363,7 @@ jobs:
           sudo apt-get install -y shfmt
 
       - name: Format shell scripts
-        run: git ls-files -z '*.sh' | xargs -0 shfmt --write --simplify --indent 2
+        run: git ls-files -z '*.sh' | xargs -0 -r shfmt --write --simplify --indent 2
 
       - name: Suggest shell script formatting
         if: github.event_name == 'pull_request'

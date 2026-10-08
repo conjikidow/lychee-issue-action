@@ -51,4 +51,4 @@ jobs:
       - name: Lint pull request title
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
-        run: cz check --message "${PR_TITLE}"
+        run: cz check --message="${PR_TITLE}"

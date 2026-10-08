@@ -56,6 +56,7 @@ jobs:
             github_actions:
               - '.github/workflows/**'
               - 'action.yaml'
+              - '.github/actionlint-matcher.json'
             github_actions_ci:
               - '.github/workflows/ci.yaml'
             pre_commit_config:
@@ -75,6 +76,7 @@ jobs:
               - '.yamllint.yaml'
             shell:
               - '**/*.sh'
+              - '.github/shellcheck-matcher.json'
 
   lint-github-actions:
     name: Lint GitHub Actions
@@ -84,7 +86,6 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
-      pull-requests: write
 
     steps:
       - name: Check out the repository
@@ -93,19 +94,10 @@ jobs:
           persist-credentials: false
 
       - name: Lint GitHub Actions
-        if: github.event_name != 'pull_request'
         run: |
           go install github.com/rhysd/actionlint/cmd/actionlint@914e7df21a07ef503a81201c76d2b11c789d3fca # v1.7.12
+          echo "::add-matcher::.github/actionlint-matcher.json"
           "$(go env GOPATH)/bin/actionlint" -color
-
-      - name: Lint GitHub Actions (reviewdog)
-        if: github.event_name == 'pull_request'
-        uses: reviewdog/action-actionlint@8b682e1e7e512151d73a6b9449cbff173846226e # v1.74.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-          filter_mode: nofilter
-          fail_level: error
 
   audit-zizmor:
     name: Audit with zizmor
@@ -239,7 +231,6 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
-      pull-requests: write
 
     steps:
       - name: Check out the repository
@@ -253,64 +244,13 @@ jobs:
           version: '1.7.2'
 
       - name: Lint TOML
-        if: github.event_name != 'pull_request'
-        run: tombi lint
+        run: tombi lint --error-on-warnings --diagnostics-format github
 
-      - name: Install reviewdog
-        if: github.event_name == 'pull_request'
-        uses: reviewdog/action-setup@d8a7baabd7f3e8544ee4dbde3ee41d0011c3a93f # v1.5.0
-        with:
-          reviewdog_version: 'v0.21.2'
-
-      - name: Lint TOML (reviewdog)
-        if: github.event_name == 'pull_request'
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NO_COLOR: 1
-        run: |
-          lint_rc=0
-          tombi lint --quiet > /tmp/tombi-lint-report.txt 2>&1 || lint_rc=$?
-          gawk '
-            match($0, /^[[:space:]]*(Warning|Error):[[:space:]]*(.*)$/, m) {
-              severity = m[1]; message = m[2]; next
-            }
-            match($0, /^[[:space:]]*at[[:space:]]+(.*):([0-9]+):([0-9]+)/, m) {
-              printf "%s:%s:%s: %s: %s\n", m[1], m[2], m[3], substr(severity, 1, 1), message
-            }
-          ' /tmp/tombi-lint-report.txt > /tmp/tombi-lint-report.efm.txt
-          reviewdog_rc=0
-          reviewdog < /tmp/tombi-lint-report.efm.txt \
-              -efm="%f:%l:%c: %t: %m" \
-              -name=tombi-lint \
-              -reporter=github-pr-review \
-              -filter-mode=nofilter \
-              -fail-level=error || reviewdog_rc=$?
-          if [ ${lint_rc} -ne 0 ] && [ ! -s /tmp/tombi-lint-report.efm.txt ]; then
-            echo "::error title=tombi::tombi lint failed before producing parseable diagnostics"
-            cat /tmp/tombi-lint-report.txt
-            exit ${lint_rc}
-          fi
-          exit ${reviewdog_rc}
-
-      - name: Format TOML
-        run: tombi format
-
-      - name: Suggest TOML formatting
-        if: github.event_name == 'pull_request'
-        uses: reviewdog/action-suggester@c387862ad6765a9729f2b40ee4d8b5769f2145c7 # v1.26.1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          tool_name: tombi-format
-          cleanup: false
-
-      - name: Check TOML formatting
-        run: git diff --exit-code
-
-  lint-yaml:
-    name: Lint YAML
+  format-toml:
+    name: Format TOML
     needs: determine-changes
     if: >-
-      needs.determine-changes.outputs.yaml == 'true'
+      needs.determine-changes.outputs.toml == 'true'
       || needs.determine-changes.outputs.github-actions-ci == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -324,28 +264,85 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install Tombi
+        uses: tombi-toml/setup-tombi@f6c2e810bb1ae4728d9269b7e354a3fd711a88ed # v1.7.2
+        with:
+          version: '1.7.2'
+
+      - name: Format TOML
+        run: tombi format
+
+      - name: Suggest TOML formatting
+        if: github.event_name == 'pull_request'
+        uses: reviewdog/action-suggester@c387862ad6765a9729f2b40ee4d8b5769f2145c7 # v1.26.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tool_name: tombi-format
+          cleanup: false
+
+      - name: Check TOML formatting
+        run: |
+          git diff --name-only | while IFS= read -r file; do
+            echo "::error file=${file},title=tombi-format::File is not formatted. Run tombi format."
+          done
+          git diff --exit-code
+
+  lint-yaml:
+    name: Lint YAML
+    needs: determine-changes
+    if: >-
+      needs.determine-changes.outputs.yaml == 'true'
+      || needs.determine-changes.outputs.github-actions-ci == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
       - name: Install uv
-        if: github.event_name != 'pull_request'
         uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           version: '0.12.23'
 
       - name: Lint YAML
-        if: github.event_name != 'pull_request'
-        run: uvx --from "yamllint==1.38.0" yamllint .
-
-      - name: Lint YAML (reviewdog)
-        if: github.event_name == 'pull_request'
-        uses: reviewdog/action-yamllint@5dd4640db975e4cac6f4e775a401695bafc28068 # v1.25.1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-          filter_mode: nofilter
-          fail_level: error
-          yamllint_flags: .
+        run: |
+          git ls-files -z '*.yaml' '*.yml' \
+            | xargs -0 -r uvx --from "yamllint==1.38.0" yamllint --format github --strict
 
   lint-shell-scripts:
     name: Lint shell scripts
+    needs: determine-changes
+    if: >-
+      needs.determine-changes.outputs.shell == 'true'
+      || needs.determine-changes.outputs.github-actions-ci == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install ShellCheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: Lint shell scripts
+        run: |
+          echo "::add-matcher::.github/shellcheck-matcher.json"
+          git ls-files -z '*.sh' | xargs -0 -r shellcheck --format gcc --external-sources
+
+  format-shell-scripts:
+    name: Format shell scripts
     needs: determine-changes
     if: >-
       needs.determine-changes.outputs.shell == 'true'
@@ -362,51 +359,28 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install shell tools
+      - name: Install shfmt
         run: |
           sudo apt-get update
           sudo apt-get install -y shfmt
-          if [ "${GITHUB_EVENT_NAME}" != "pull_request" ]; then
-            sudo apt-get install -y shellcheck
-          fi
 
-      - name: Collect shell scripts
-        id: shell-scripts
-        run: |
-          shell_files_path="$(mktemp)"
-          find . -type f -name '*.sh' -not -path './.git/*' -print0 > "${shell_files_path}"
-          echo "files=${shell_files_path}" >> "${GITHUB_OUTPUT}"
-          if [ ! -s "${shell_files_path}" ]; then
-            echo "No shell scripts found."
-            echo "found=false" >> "${GITHUB_OUTPUT}"
-          else
-            echo "found=true" >> "${GITHUB_OUTPUT}"
-          fi
+      - name: Format shell scripts
+        run: git ls-files -z '*.sh' | xargs -0 -r shfmt --write --simplify --indent 2
 
-      - name: Check shell script formatting
-        if: steps.shell-scripts.outputs.found == 'true'
-        env:
-          SHELL_FILES: ${{ steps.shell-scripts.outputs.files }}
-        run: xargs -0 shfmt --diff --simplify -i 2 < "${SHELL_FILES}"
-
-      - name: Lint shell scripts
-        if: >-
-          github.event_name != 'pull_request'
-          && steps.shell-scripts.outputs.found == 'true'
-        env:
-          SHELL_FILES: ${{ steps.shell-scripts.outputs.files }}
-        run: xargs -0 shellcheck --external-sources < "${SHELL_FILES}"
-
-      - name: Lint shell scripts (reviewdog)
-        if: >-
-          github.event_name == 'pull_request'
-          && steps.shell-scripts.outputs.found == 'true'
-        uses: reviewdog/action-shellcheck@d0b8d5fd7fad6afdb6e1b6ce1778892be4d1f427 # v1.34.1
+      - name: Suggest shell script formatting
+        if: github.event_name == 'pull_request'
+        uses: reviewdog/action-suggester@c387862ad6765a9729f2b40ee4d8b5769f2145c7 # v1.26.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-          filter_mode: nofilter
-          fail_level: error
+          tool_name: shfmt
+          cleanup: false
+
+      - name: Check shell script formatting
+        run: |
+          git diff --name-only | while IFS= read -r file; do
+            echo "::error file=${file},title=shfmt::File is not formatted. Run shfmt."
+          done
+          git diff --exit-code
 
   run-prek-hooks:
     name: Run prek hooks
@@ -433,7 +407,6 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
-      pull-requests: write
 
     steps:
       - name: Check out the repository
@@ -442,18 +415,7 @@ jobs:
           persist-credentials: false
 
       - name: Check spelling
-        if: github.event_name != 'pull_request'
         uses: crate-ci/typos@00f422f3b19c57bc6338715ebfe3316d38768461 # v1.50.3
-
-      - name: Check spelling (reviewdog)
-        if: github.event_name == 'pull_request'
-        uses: reviewdog/action-typos@d5eb1bbcd1b3bfde596f6eeb470322727862fe98 # v1.19.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-          filter_mode: nofilter
-          fail_level: error
-          typos_flags: .
 
   lint-commit-messages:
     name: Lint commit messages

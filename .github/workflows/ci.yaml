@@ -157,7 +157,7 @@ jobs:
           node-version: '24'
 
       - name: Validate Renovate config
-        run: npx --yes --package renovate@44.132.2 renovate-config-validator .github/renovate.json5
+        run: npx --package renovate@44.132.2 --yes renovate-config-validator .github/renovate.json5
 
   lint-markdown:
     name: Lint Markdown
@@ -334,7 +334,7 @@ jobs:
       - name: Install ShellCheck
         run: |
           sudo apt-get update
-          sudo apt-get install -y shellcheck
+          sudo apt-get --yes install shellcheck
 
       - name: Lint shell scripts
         run: |
@@ -362,7 +362,7 @@ jobs:
       - name: Install shfmt
         run: |
           sudo apt-get update
-          sudo apt-get install -y shfmt
+          sudo apt-get --yes install shfmt
 
       - name: Format shell scripts
         run: git ls-files -z '*.sh' | xargs -0 -r shfmt --write --simplify --indent 2
@@ -399,7 +399,7 @@ jobs:
         uses: j178/prek-action@1382ad72dea72f9d53832f2bcb65b3e87a947204 # v3.0.1
         with:
           prek-version: 'v0.5.5'
-          extra-args: --all-files --skip no-commit-to-branch
+          extra-args: --skip no-commit-to-branch --all-files
 
   check-spelling:
     name: Check spelling

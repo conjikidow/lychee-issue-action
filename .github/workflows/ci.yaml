@@ -310,7 +310,9 @@ jobs:
           version: '0.12.23'
 
       - name: Lint YAML
-        run: git ls-files -z '*.yaml' '*.yml' | xargs -0 uvx --from "yamllint==1.38.0" yamllint --format github --strict
+        run: |
+          git ls-files -z '*.yaml' '*.yml' \
+            | xargs -0 -r uvx --from "yamllint==1.38.0" yamllint --format github --strict
 
   lint-shell-scripts:
     name: Lint shell scripts

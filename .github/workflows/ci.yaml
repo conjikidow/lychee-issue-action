@@ -71,8 +71,8 @@ jobs:
             toml:
               - '**/*.toml'
             yaml:
-              - '**/*.yml'
               - '**/*.yaml'
+              - '**/*.yml'
               - '.yamllint.yaml'
             shell:
               - '**/*.sh'

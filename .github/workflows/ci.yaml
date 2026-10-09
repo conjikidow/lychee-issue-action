@@ -155,7 +155,20 @@ jobs:
           node-version: '24'
 
       - name: Validate Renovate config
-        run: npx --package=renovate@44.132.2 --yes renovate-config-validator --strict --no-global .github/renovate.json5
+        env:
+          LOG_FORMAT: json
+        run: |
+          npx --package=renovate@44.132.2 --yes renovate-config-validator --strict --no-global .github/renovate.json5 \
+            | jq --raw-output --arg file .github/renovate.json5 '
+                def escape: gsub("%"; "%25") | gsub("\r"; "%0D") | gsub("\n"; "%0A");
+                def level: if .level >= 50 then "ERROR" elif .level >= 40 then "WARN" else "INFO" end;
+                "\(level): \(.msg)",
+                (.err.message? // empty),
+                (.errors[]? | "::error file=\($file),title=\(.topic)::\(.topic): \(.message | escape)"),
+                (.warnings[]? | "::warning file=\($file),title=\(.topic)::\(.topic): \(.message | escape)"),
+                (select(.msg == "Config migration necessary")
+                  | "::warning file=\($file),title=\(.msg)::\(.msg): See the log for the diff.")
+              '
 
   lint-markdown:
     name: Lint Markdown

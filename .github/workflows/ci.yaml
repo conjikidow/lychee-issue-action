@@ -56,7 +56,7 @@ jobs:
             github_actions:
               - '.github/workflows/**'
               - 'action.yaml'
-              - '.github/actionlint-matcher.json'
+              - '.github/problem-matchers/actionlint.json'
             github_actions_ci:
               - '.github/workflows/ci.yaml'
             pre_commit_config:
@@ -76,7 +76,7 @@ jobs:
               - '.yamllint.yaml'
             shell:
               - '**/*.sh'
-              - '.github/shellcheck-matcher.json'
+              - '.github/problem-matchers/shellcheck.json'
 
   lint-github-actions:
     name: Lint GitHub Actions
@@ -96,7 +96,7 @@ jobs:
       - name: Lint GitHub Actions
         run: |
           go install github.com/rhysd/actionlint/cmd/actionlint@914e7df21a07ef503a81201c76d2b11c789d3fca # v1.7.12
-          echo "::add-matcher::.github/actionlint-matcher.json"
+          echo "::add-matcher::.github/problem-matchers/actionlint.json"
           "$(go env GOPATH)/bin/actionlint" -color
 
   audit-zizmor:
@@ -339,7 +339,7 @@ jobs:
 
       - name: Lint shell scripts
         run: |
-          echo "::add-matcher::.github/shellcheck-matcher.json"
+          echo "::add-matcher::.github/problem-matchers/shellcheck.json"
           git ls-files -z '*.sh' | xargs -0 -r shellcheck --format=gcc --external-sources
 
   format-shell-scripts:

@@ -74,6 +74,7 @@ jobs:
               - '.yamllint.yaml'
             shell:
               - '**/*.sh'
+              - '.shellcheckrc'
               - '.github/problem-matchers/shellcheck.json'
 
   lint-github-actions:
@@ -345,7 +346,7 @@ jobs:
       - name: Lint shell scripts
         run: |
           echo "::add-matcher::.github/problem-matchers/shellcheck.json"
-          git ls-files -z '*.sh' | xargs -0 -r shellcheck --format=gcc --external-sources
+          git ls-files -z '*.sh' | xargs -0 -r shellcheck --format=gcc
 
   format-shell-scripts:
     name: Format shell scripts

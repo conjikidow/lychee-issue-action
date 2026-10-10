@@ -32,10 +32,10 @@ jobs:
       github-actions-ci: ${{ steps.changed-files.outputs.github_actions_ci_any_changed }}
       pre-commit-config: ${{ steps.changed-files.outputs.pre_commit_config_any_changed }}
       renovate-config: ${{ steps.changed-files.outputs.renovate_config_any_changed }}
-      markdown: ${{ steps.changed-files.outputs.markdown_any_changed }}
       json5: ${{ steps.changed-files.outputs.json5_any_changed }}
       toml: ${{ steps.changed-files.outputs.toml_any_changed }}
       yaml: ${{ steps.changed-files.outputs.yaml_any_changed }}
+      markdown: ${{ steps.changed-files.outputs.markdown_any_changed }}
       shell: ${{ steps.changed-files.outputs.shell_any_changed }}
 
     steps:
@@ -60,9 +60,6 @@ jobs:
               - '.pre-commit-config.yaml'
             renovate_config:
               - '.github/renovate.json5'
-            markdown:
-              - '**/*.md'
-              - '.rumdl.toml'
             json5:
               - '**/*.json5'
               - '.github/problem-matchers/json5.json'
@@ -72,6 +69,9 @@ jobs:
               - '**/*.yaml'
               - '**/*.yml'
               - '.yamllint.yaml'
+            markdown:
+              - '**/*.md'
+              - '.rumdl.toml'
             shell:
               - '**/*.sh'
               - '.shellcheckrc'
@@ -171,29 +171,6 @@ jobs:
                   | "::warning file=\($file),title=\(.msg)::\(.msg): See the log for the diff.")
               '
 
-  lint-markdown:
-    name: Lint Markdown
-    needs: determine-changes
-    if: >-
-      needs.determine-changes.outputs.markdown == 'true'
-      || needs.determine-changes.outputs.github-actions-ci == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: read
-
-    steps:
-      - name: Check out the repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Lint Markdown
-        uses: rvben/rumdl@9c4cc2a2ebe176de68e1788106e25af8a9bd3899 # v0.2.78
-        with:
-          version: '0.2.78'
-          report-type: annotations
-
   validate-json5:
     name: Validate JSON5
     needs: determine-changes
@@ -226,31 +203,6 @@ jobs:
               || exit_code=1
           done < <(git ls-files -z '*.json5')
           exit "${exit_code}"
-
-  lint-toml:
-    name: Lint TOML
-    needs: determine-changes
-    if: >-
-      needs.determine-changes.outputs.toml == 'true'
-      || needs.determine-changes.outputs.github-actions-ci == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: read
-
-    steps:
-      - name: Check out the repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Install Tombi
-        uses: tombi-toml/setup-tombi@d8f3250344c4e9107b91c02bc11efcf72baf5793 # v1.7.3
-        with:
-          version: '1.7.3'
-
-      - name: Lint TOML
-        run: tombi lint --error-on-warnings --diagnostics-format=github
 
   format-toml:
     name: Format TOML
@@ -293,6 +245,31 @@ jobs:
           done
           git diff --exit-code
 
+  lint-toml:
+    name: Lint TOML
+    needs: determine-changes
+    if: >-
+      needs.determine-changes.outputs.toml == 'true'
+      || needs.determine-changes.outputs.github-actions-ci == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Tombi
+        uses: tombi-toml/setup-tombi@d8f3250344c4e9107b91c02bc11efcf72baf5793 # v1.7.3
+        with:
+          version: '1.7.3'
+
+      - name: Lint TOML
+        run: tombi lint --error-on-warnings --diagnostics-format=github
+
   lint-yaml:
     name: Lint YAML
     needs: determine-changes
@@ -321,11 +298,11 @@ jobs:
           git ls-files -z '*.yaml' '*.yml' \
             | xargs -0 -r uvx --from="yamllint==1.38.0" yamllint --format=github --strict
 
-  lint-shell-scripts:
-    name: Lint shell scripts
+  lint-markdown:
+    name: Lint Markdown
     needs: determine-changes
     if: >-
-      needs.determine-changes.outputs.shell == 'true'
+      needs.determine-changes.outputs.markdown == 'true'
       || needs.determine-changes.outputs.github-actions-ci == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -338,15 +315,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install ShellCheck
-        run: |
-          sudo apt-get update
-          sudo apt-get --yes install shellcheck
-
-      - name: Lint shell scripts
-        run: |
-          echo "::add-matcher::.github/problem-matchers/shellcheck.json"
-          git ls-files -z '*.sh' | xargs -0 -r shellcheck --format=gcc
+      - name: Lint Markdown
+        uses: rvben/rumdl@9c4cc2a2ebe176de68e1788106e25af8a9bd3899 # v0.2.78
+        with:
+          version: '0.2.78'
+          report-type: annotations
 
   format-shell-scripts:
     name: Format shell scripts
@@ -389,8 +362,12 @@ jobs:
           done
           git diff --exit-code
 
-  run-prek-hooks:
-    name: Run prek hooks
+  lint-shell-scripts:
+    name: Lint shell scripts
+    needs: determine-changes
+    if: >-
+      needs.determine-changes.outputs.shell == 'true'
+      || needs.determine-changes.outputs.github-actions-ci == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -402,11 +379,15 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Run prek hooks
-        uses: j178/prek-action@1382ad72dea72f9d53832f2bcb65b3e87a947204 # v3.0.1
-        with:
-          prek-version: 'v0.5.5'
-          extra-args: --skip=no-commit-to-branch --all-files
+      - name: Install ShellCheck
+        run: |
+          sudo apt-get update
+          sudo apt-get --yes install shellcheck
+
+      - name: Lint shell scripts
+        run: |
+          echo "::add-matcher::.github/problem-matchers/shellcheck.json"
+          git ls-files -z '*.sh' | xargs -0 -r shellcheck --format=gcc
 
   check-spelling:
     name: Check spelling
@@ -461,3 +442,22 @@ jobs:
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: cz check --rev-range="${PR_BASE_SHA}..${PR_HEAD_SHA}"
+
+  run-prek-hooks:
+    name: Run prek hooks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Run prek hooks
+        uses: j178/prek-action@1382ad72dea72f9d53832f2bcb65b3e87a947204 # v3.0.1
+        with:
+          prek-version: 'v0.5.5'
+          extra-args: --skip=no-commit-to-branch --all-files

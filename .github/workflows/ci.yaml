@@ -32,7 +32,7 @@ jobs:
       github-actions-ci: ${{ steps.changed-files.outputs.github_actions_ci_any_changed }}
       pre-commit-config: ${{ steps.changed-files.outputs.pre_commit_config_any_changed }}
       renovate-config: ${{ steps.changed-files.outputs.renovate_config_any_changed }}
-      md: ${{ steps.changed-files.outputs.md_any_changed }}
+      markdown: ${{ steps.changed-files.outputs.markdown_any_changed }}
       json5: ${{ steps.changed-files.outputs.json5_any_changed }}
       toml: ${{ steps.changed-files.outputs.toml_any_changed }}
       yaml: ${{ steps.changed-files.outputs.yaml_any_changed }}
@@ -60,7 +60,7 @@ jobs:
               - '.pre-commit-config.yaml'
             renovate_config:
               - '.github/renovate.json5'
-            md:
+            markdown:
               - '**/*.md'
               - '.rumdl.toml'
             json5:
@@ -175,7 +175,7 @@ jobs:
     name: Lint Markdown
     needs: determine-changes
     if: >-
-      needs.determine-changes.outputs.md == 'true'
+      needs.determine-changes.outputs.markdown == 'true'
       || needs.determine-changes.outputs.github-actions-ci == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10

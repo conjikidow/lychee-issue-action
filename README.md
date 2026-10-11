@@ -35,11 +35,11 @@ on:
     - cron: '0 0 * * 1'
   workflow_dispatch:
 
-concurrency:
-  group: ${{ github.workflow }}
-
 jobs:
   track-broken-links:
+    concurrency:
+      group: broken-link-issues
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     permissions:
       contents: read

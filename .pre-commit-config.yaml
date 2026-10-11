@@ -2,10 +2,29 @@
 default_stages: [pre-commit]
 
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c  # frozen: v6.0.0
+    hooks:
+      - id: fix-byte-order-marker
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+      - id: trailing-whitespace
+        args: ["--markdown-linebreak-ext=md"]
+      - id: end-of-file-fixer
+      - id: check-json
+        fail_fast: true
+      - id: pretty-format-json
+        args: ["--autofix", "--no-sort-keys"]
+
   - repo: https://github.com/crate-ci/typos
     rev: 00f422f3b19c57bc6338715ebfe3316d38768461  # frozen: v1.50.3
     hooks:
       - id: typos
+
+  - repo: https://github.com/tombi-toml/tombi-pre-commit
+    rev: 9f0b6fb827f5c25aa1c84b15fff7bf13e555688b  # frozen: v1.7.3
+    hooks:
+      - id: tombi-format
 
   - repo: https://github.com/rvben/rumdl-pre-commit
     rev: 83cecb6b523a053d7d3dfdc4798d705b505a88f9  # frozen: v0.2.78
@@ -13,10 +32,33 @@ repos:
       - id: rumdl
         args: ["--fix"]
 
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: 05c1426671b9237fb5e1444dd63aa5731bec0dfb  # frozen: v3.13.1-1
+    hooks:
+      - id: shfmt
+        args: ["--write", "--simplify", "--indent=2"]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c  # frozen: v6.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-illegal-windows-names
+      - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-vcs-permalinks
+      - id: check-xml
+      - id: check-yaml
+      - id: destroyed-symlinks
+      - id: detect-private-key
+      - id: no-commit-to-branch
+
   - repo: https://github.com/tombi-toml/tombi-pre-commit
     rev: 9f0b6fb827f5c25aa1c84b15fff7bf13e555688b  # frozen: v1.7.3
     hooks:
-      - id: tombi-format
       - id: tombi-lint
         args: ["--error-on-warnings"]
 
@@ -26,43 +68,10 @@ repos:
       - id: yamllint
         args: ["--format=standard", "--strict"]
 
-  - repo: https://github.com/scop/pre-commit-shfmt
-    rev: 05c1426671b9237fb5e1444dd63aa5731bec0dfb  # frozen: v3.13.1-1
-    hooks:
-      - id: shfmt
-        args: ["--write", "--simplify", "--indent=2"]
-
   - repo: https://github.com/koalaman/shellcheck-precommit
     rev: 99470f5e12208ff0fb17ab81c3c494f7620a1d8d  # frozen: v0.11.0
     hooks:
       - id: shellcheck
-
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c  # frozen: v6.0.0
-    hooks:
-      - id: fix-byte-order-marker
-      - id: mixed-line-ending
-        args: ["--fix=lf"]
-      - id: end-of-file-fixer
-      - id: trailing-whitespace
-        args: ["--markdown-linebreak-ext=md"]
-      - id: pretty-format-json
-        args: ["--autofix", "--no-sort-keys"]
-      - id: check-json
-      - id: check-toml
-      - id: check-yaml
-      - id: check-xml
-      - id: check-added-large-files
-      - id: check-case-conflict
-      - id: check-illegal-windows-names
-      - id: check-symlinks
-      - id: destroyed-symlinks
-      - id: check-vcs-permalinks
-      - id: detect-private-key
-      - id: check-merge-conflict
-      - id: check-executables-have-shebangs
-      - id: check-shebang-scripts-are-executable
-      - id: no-commit-to-branch
 
   - repo: https://github.com/commitizen-tools/commitizen
     rev: 57217c394fff5064bedd48421fe4b6f5f73aad47  # frozen: v4.19.2

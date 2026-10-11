@@ -9,7 +9,8 @@
 A GitHub Action to track the broken links found by [lychee](https://github.com/lycheeverse/lychee) as GitHub issues.
 
 > [!WARNING]
-> This project is in early development. The API may change in future releases.
+> This project is in early development.
+> The API may change in future releases.
 
 ## Features
 
@@ -23,8 +24,7 @@ The action requires `gh` and `jq`, which the GitHub-hosted runner images provide
 
 ### Workflow Example
 
-The link check itself is left to [`lychee-action`](https://github.com/lycheeverse/lychee-action),
-which writes the report this action reads.
+The link check itself is left to [`lychee-action`](https://github.com/lycheeverse/lychee-action), which writes the report this action reads.
 The following workflow checks the links every Monday and keeps one issue open per unreachable link.
 
 ```yaml
@@ -71,8 +71,7 @@ The `concurrency` group serializes the runs: two overlapping runs would both see
 and both would open an issue for the same link.
 
 The example references actions by tag for readability.
-For production workflows, consider pinning each action to a full-length commit SHA,
-as [GitHub recommends](https://docs.github.com/en/actions/reference/security/secure-use#using-third-party-actions).
+For production workflows, consider pinning each action to a full-length commit SHA, as [GitHub recommends](https://docs.github.com/en/actions/reference/security/secure-use#using-third-party-actions).
 Releases of this action are immutable, so its own tags are already locked to a single commit.
 
 ### Permissions
@@ -109,7 +108,8 @@ A GitHub App installation token needs the same access granted to the app itself.
 
 `label` is applied to every issue the action opens, and it is also the key the action looks its own issues up by.
 `extra-labels` is applied on creation only and plays no part in the lookup.
-Being the key, `label` names a single label: surrounding whitespace is trimmed, and a value containing a comma is rejected.
+Being the key, `label` names a single label: surrounding whitespace is trimmed,
+and a value containing a comma is rejected.
 
 Any of these labels that the repository does not define yet is created before the first issue is opened,
 because `gh issue create` rejects a label that does not exist.
@@ -136,9 +136,8 @@ Define them in the repository beforehand if you do not want the action to create
 
 Licensed under either of [MIT license](LICENSE-MIT) or [Apache License, Version 2.0](LICENSE-APACHE) at your option.
 
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in this software
-by you, as defined in the Apache-2.0 license, shall be dually licensed as above,
-without any additional terms or conditions.
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in this software by you,
+as defined in the Apache-2.0 license, shall be dually licensed as above, without any additional terms or conditions.
 
 ## Contributing & Feedback
 

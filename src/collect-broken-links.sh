@@ -6,7 +6,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 require_cmd jq
 
 records="$(mktemp)"
-jq -c --arg prefix "file://${GITHUB_WORKSPACE}/" --arg root "${GITHUB_WORKSPACE}/" '
+jq --compact-output --arg prefix "file://${GITHUB_WORKSPACE}/" --arg root "${GITHUB_WORKSPACE}/" '
   [
     ((.error_map // {}), (.timeout_map // {})) | to_entries[] | .key as $file | .value[] | {
       url: (.url | if startswith($prefix) then ltrimstr($prefix) else . end),

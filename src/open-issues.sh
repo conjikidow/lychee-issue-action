@@ -8,7 +8,7 @@ require_cmd jq
 
 label_args=()
 while IFS= read -r name <&3; do
-  label_args+=(--label "$(csv_field "${name}")")
+  label_args+=("--label=$(csv_field "${name}")")
 done 3< <(split_labels "${NORMALIZED_LABEL},${EXTRA_LABELS}")
 
 workflow="${GITHUB_WORKFLOW_REF%%@*}"
@@ -41,18 +41,18 @@ write_body() {
   fi
 
   local present
-  present="$(jq -r --argjson limit "${refs_limit}" '[.refs[:$limit][].file] | unique[]' <<<"${record}" |
+  present="$(jq --raw-output --argjson limit "${refs_limit}" '[.refs[:$limit][].file] | unique[]' <<<"${record}" |
     while IFS= read -r file; do
       if [ "$(git -C "${GITHUB_WORKSPACE}" cat-file -t "${GITHUB_SHA}:${file}" 2>/dev/null)" = 'blob' ]; then
         printf '%s\n' "${file}"
       fi
-    done | jq -Rn '[inputs]')"
+    done | jq --null-input --raw-input '[inputs]')"
 
   printf 'A link check with [lychee](https://github.com/lycheeverse/lychee) found this link to be unreachable.\n\n'
   printf '**Link:** %s\n' "${link}"
   printf '**Status:** %s\n\n' "\`${status//\`/${substitute}}\`"
   printf '**Referenced from:**\n\n'
-  jq -r --argjson limit "${refs_limit}" --argjson budget "${budget}" --argjson present "${present}" --arg blob "${blob_url}" '
+  jq --raw-output --arg blob "${blob_url}" --argjson limit "${refs_limit}" --argjson budget "${budget}" --argjson present "${present}" '
     [
       .refs[:$limit][]
       | .file as $file
@@ -79,13 +79,13 @@ write_body() {
 opened=0
 # The records are read on a dedicated descriptor so that gh keeps its own stdin.
 while IFS= read -r record <&3; do
-  url="$(jq -r '.url' <<<"${record}")"
+  url="$(jq --raw-output '.url' <<<"${record}")"
   if grep -qxF -- "${url}" "${reported_urls}"; then
     continue
   fi
 
-  status="$(jq -r '.status | tostring' <<<"${record}")"
-  budget="$(jq -r --argjson limit "${body_limit}" --argjson overhead "${body_overhead}" \
+  status="$(jq --raw-output '.status | tostring' <<<"${record}")"
+  budget="$(jq --raw-output --argjson limit "${body_limit}" --argjson overhead "${body_overhead}" \
     '$limit - $overhead - 2 * (.url | tostring | length) - (.status | tostring | length)' <<<"${record}")"
   if [ "${budget}" -le 0 ]; then
     log_warn "No issue opened for ${url}: it does not fit in an issue body."
@@ -100,7 +100,7 @@ while IFS= read -r record <&3; do
     title="${title:0:253}..."
   fi
 
-  gh issue create --title "${title}" --body-file "${body}" "${label_args[@]}"
+  gh issue create --title="${title}" --body-file="${body}" "${label_args[@]}"
   opened="$((opened + 1))"
   pace_mutation
 done 3<"${RECORDS}"

@@ -9,7 +9,7 @@ require_cmd jq
 limit=1000
 
 listing="$(mktemp)"
-gh issue list --label "$(csv_field "${NORMALIZED_LABEL}")" --state open --limit "${limit}" --json number,body >"${listing}"
+gh issue list --label="$(csv_field "${NORMALIZED_LABEL}")" --state=open --limit="${limit}" --json=number,body >"${listing}"
 
 if [ "$(jq 'length' "${listing}")" -ge "${limit}" ]; then
   log_warn "More than ${limit} open issues carry the '${NORMALIZED_LABEL}' label, so the ones past that are ignored."
@@ -17,7 +17,7 @@ fi
 
 # The action writes its marker at the end of the body, so the last one wins.
 reported="$(mktemp)"
-jq -r '.[]
+jq --raw-output '.[]
   | [.number, ([.body | scan("<!-- lychee: (.*?) -->")] | last | .[0]? // empty | gsub("^\\s+|\\s+$"; ""))]
   | select(length == 2 and (.[1] | length > 0))
   | "\(.[0])\t\(.[1])"' "${listing}" >"${reported}"

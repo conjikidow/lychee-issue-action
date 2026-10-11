@@ -1,16 +1,16 @@
 ---
-"ci":
+ci:
   - changed-files:
-      - any-glob-to-any-file: [".github/workflows/**"]
+      - any-glob-to-any-file: ['.github/workflows/**']
 
-"pre-commit":
+pre-commit:
   - changed-files:
-      - any-glob-to-any-file: [".pre-commit-config.yaml"]
+      - any-glob-to-any-file: ['.pre-commit-config.yaml']
 
-"documentation":
+documentation:
   - changed-files:
-      - any-glob-to-any-file: ["**/*.md"]
+      - any-glob-to-any-file: ['**/*.md']
 
-"versioning":
+versioning:
   - changed-files:
-      - any-glob-to-any-file: [".bumpversion.toml"]
+      - any-glob-to-any-file: ['.bumpversion.toml']

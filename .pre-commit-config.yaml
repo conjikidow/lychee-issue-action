@@ -8,14 +8,14 @@ repos:
     hooks:
       - id: fix-byte-order-marker
       - id: mixed-line-ending
-        args: ["--fix=lf"]
+        args: [--fix=lf]
       - id: trailing-whitespace
-        args: ["--markdown-linebreak-ext=md"]
+        args: [--markdown-linebreak-ext=md]
       - id: end-of-file-fixer
       - id: check-json
         fail_fast: true
       - id: pretty-format-json
-        args: ["--autofix", "--no-sort-keys"]
+        args: [--autofix, --no-sort-keys]
 
   - repo: https://github.com/crate-ci/typos
     rev: 00f422f3b19c57bc6338715ebfe3316d38768461  # frozen: v1.50.3
@@ -31,13 +31,13 @@ repos:
     rev: 83cecb6b523a053d7d3dfdc4798d705b505a88f9  # frozen: v0.2.78
     hooks:
       - id: rumdl-check
-        args: ["--fix"]
+        args: [--fix]
 
   - repo: https://github.com/scop/pre-commit-shfmt
     rev: 479be5958357ba5ab65ce47172117348516860e9  # frozen: v3.14.1-1
     hooks:
       - id: shfmt
-        args: ["--write", "--simplify", "--indent=2"]
+        args: [--write, --simplify, --indent=2]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c  # frozen: v6.0.0
@@ -61,13 +61,13 @@ repos:
     rev: 9f0b6fb827f5c25aa1c84b15fff7bf13e555688b  # frozen: v1.7.3
     hooks:
       - id: tombi-lint
-        args: ["--error-on-warnings"]
+        args: [--error-on-warnings]
 
   - repo: https://github.com/adrienverge/yamllint
     rev: cba56bcde1fdd01c1deb3f945e69764c291a6530  # frozen: v1.38.0
     hooks:
       - id: yamllint
-        args: ["--format=standard", "--strict"]
+        args: [--format=standard, --strict]
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: a6564f5d57444e123433a5c9af733e3975c77229  # frozen: v0.11.0.1-1

@@ -168,6 +168,12 @@
       pinDigests: false,
     },
     {
+      matchDepNames: [
+        'scop/pre-commit-shfmt',
+      ],
+      versioning: 'pep440',
+    },
+    {
       matchFileNames: [
         '.github/workflows/**',
       ],

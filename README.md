@@ -81,7 +81,7 @@ The token passed to `github-token` needs `issues: write` to open and close the i
 and to create the labels it applies.
 
 The default `${{ github.token }}` carries whatever the workflow grants it,
-so grant that scope in the job, as the example above does.
+so grant that scope in the job as the example above does.
 The `contents: read` there is for the checkout step, not for this action.
 
 The `permissions:` block does not reach a token you pass yourself.

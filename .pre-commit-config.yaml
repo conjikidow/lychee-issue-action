@@ -69,8 +69,8 @@ repos:
       - id: yamllint
         args: ["--format=standard", "--strict"]
 
-  - repo: https://github.com/koalaman/shellcheck-precommit
-    rev: 99470f5e12208ff0fb17ab81c3c494f7620a1d8d  # frozen: v0.11.0
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: a6564f5d57444e123433a5c9af733e3975c77229  # frozen: v0.11.0.1-1
     hooks:
       - id: shellcheck
 

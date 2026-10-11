@@ -95,6 +95,18 @@
       depNameTemplate: 'adrienverge/yamllint',
       packageNameTemplate: 'yamllint',
     },
+    {
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^\\.github/workflows/ci\\.ya?ml$/',
+      ],
+      matchStrings: [
+        'shellcheck-py==(?<currentValue>[^"\\s]+)',
+      ],
+      datasourceTemplate: 'pypi',
+      depNameTemplate: 'shellcheck-py/shellcheck-py',
+      packageNameTemplate: 'shellcheck-py',
+    },
   ],
   packageRules: [
     {
@@ -118,6 +130,13 @@
         'rvben/rumdl-pre-commit',
       ],
       groupName: 'rumdl',
+    },
+    {
+      matchDepNames: [
+        'shellcheck-py/shellcheck-py',
+      ],
+      groupName: 'shellcheck',
+      versioning: 'pep440',
     },
     {
       matchDepNames: [

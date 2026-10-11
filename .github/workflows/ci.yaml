@@ -93,8 +93,10 @@ jobs:
           persist-credentials: false
 
       - name: Lint GitHub Actions
+        env:
+          ACTIONLINT_VERSION: '1.7.12'
         run: |
-          go install github.com/rhysd/actionlint/cmd/actionlint@914e7df21a07ef503a81201c76d2b11c789d3fca # v1.7.12
+          go install "github.com/rhysd/actionlint/cmd/actionlint@v${ACTIONLINT_VERSION}"
           echo "::add-matcher::.github/problem-matchers/actionlint.json"
           "$(go env GOPATH)/bin/actionlint" -color
 
@@ -158,8 +160,10 @@ jobs:
       - name: Validate Renovate config
         env:
           LOG_FORMAT: json
+          RENOVATE_VERSION: '44.132.2'
         run: |
-          npx --package=renovate@44.132.2 --yes renovate-config-validator --strict --no-global .github/renovate.json5 \
+          npx --package="renovate@${RENOVATE_VERSION}" --yes renovate-config-validator \
+            --strict --no-global .github/renovate.json5 \
             | jq --raw-output --arg file .github/renovate.json5 '
                 def escape: gsub("%"; "%25") | gsub("\r"; "%0D") | gsub("\n"; "%0A");
                 def level: if .level >= 50 then "ERROR" elif .level >= 40 then "WARN" else "INFO" end;
@@ -189,11 +193,13 @@ jobs:
           persist-credentials: false
 
       - name: Validate JSON5
+        env:
+          JSON5_VERSION: '2.2.3'
         run: |
           echo "::add-matcher::.github/problem-matchers/json5.json"
           exit_code=0
           while IFS= read -r -d '' json5_file; do
-            npx --yes json5@2.2.3 --validate "${json5_file}" 2>&1 \
+            npx --yes "json5@${JSON5_VERSION}" --validate "${json5_file}" 2>&1 \
               | while IFS= read -r line; do
                   case "${line}" in
                     'JSON5: '*) printf '%s: %s\n' "${json5_file}" "${line}" ;;
@@ -294,9 +300,11 @@ jobs:
           enable-cache: false
 
       - name: Lint YAML
+        env:
+          YAMLLINT_VERSION: '1.38.0'
         run: |
           git ls-files -z '*.yaml' '*.yml' \
-            | xargs -0 -r uvx --from="yamllint==1.38.0" yamllint --format=github --strict
+            | xargs -0 -r uvx --from="yamllint==${YAMLLINT_VERSION}" yamllint --format=github --strict
 
   lint-markdown:
     name: Lint Markdown
@@ -386,9 +394,12 @@ jobs:
           enable-cache: false
 
       - name: Lint shell scripts
+        env:
+          SHELLCHECK_PY_VERSION: '0.11.0.1'
         run: |
           echo "::add-matcher::.github/problem-matchers/shellcheck.json"
-          git ls-files -z '*.sh' | xargs -0 -r uvx --from="shellcheck-py==0.11.0.1" shellcheck --format=gcc
+          git ls-files -z '*.sh' \
+            | xargs -0 -r uvx --from="shellcheck-py==${SHELLCHECK_PY_VERSION}" shellcheck --format=gcc
 
   check-spelling:
     name: Check spelling

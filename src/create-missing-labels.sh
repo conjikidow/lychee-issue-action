@@ -24,4 +24,4 @@ while IFS= read -r name <&3; do
   pace_mutation
   # A name repeated across the inputs must not be created twice.
   printf '%s\n' "${name}" >>"${existing}"
-done 3< <(split_labels "${LABEL},${EXTRA_LABELS}")
+done 3< <(split_labels "${NORMALIZED_LABEL},${EXTRA_LABELS}")

@@ -64,7 +64,7 @@ runs:
       env:
         GH_TOKEN: ${{ inputs.github-token }}
         GH_REPO: ${{ github.repository }}
-        LABEL: ${{ steps.validate.outputs.label }}
+        NORMALIZED_LABEL: ${{ steps.validate.outputs.label }}
       run: bash "${GITHUB_ACTION_PATH}/src/list-reported-issues.sh"
 
     - name: Create the missing labels
@@ -74,7 +74,7 @@ runs:
         GH_TOKEN: ${{ inputs.github-token }}
         GH_REPO: ${{ github.repository }}
         EXTRA_LABELS: ${{ inputs.extra-labels }}
-        LABEL: ${{ steps.validate.outputs.label }}
+        NORMALIZED_LABEL: ${{ steps.validate.outputs.label }}
       run: bash "${GITHUB_ACTION_PATH}/src/create-missing-labels.sh"
 
     - name: Open issues for the newly broken links
@@ -85,7 +85,7 @@ runs:
         GH_REPO: ${{ github.repository }}
         EXTRA_LABELS: ${{ inputs.extra-labels }}
         TITLE_PREFIX: ${{ inputs.title-prefix }}
-        LABEL: ${{ steps.validate.outputs.label }}
+        NORMALIZED_LABEL: ${{ steps.validate.outputs.label }}
         RECORDS: ${{ steps.collect.outputs.records }}
         REPORTED: ${{ steps.reported.outputs.reported }}
       run: bash "${GITHUB_ACTION_PATH}/src/open-issues.sh"

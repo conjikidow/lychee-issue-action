@@ -9,7 +9,7 @@ require_cmd jq
 label_args=()
 while IFS= read -r name <&3; do
   label_args+=(--label "$(csv_field "${name}")")
-done 3< <(split_labels "${LABEL},${EXTRA_LABELS}")
+done 3< <(split_labels "${NORMALIZED_LABEL},${EXTRA_LABELS}")
 
 workflow="${GITHUB_WORKFLOW_REF%%@*}"
 report_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/workflows/${workflow##*/}"

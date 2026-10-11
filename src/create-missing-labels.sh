@@ -8,7 +8,7 @@ require_cmd gh
 limit=1000
 
 existing="$(mktemp)"
-gh label list --limit "${limit}" --json name --jq '.[].name' >"${existing}"
+gh label list --limit="${limit}" --json=name --jq='.[].name' >"${existing}"
 
 if [ "$(wc -l <"${existing}")" -ge "${limit}" ]; then
   log_warn "The repository defines more than ${limit} labels, so a label past that is taken to be missing."

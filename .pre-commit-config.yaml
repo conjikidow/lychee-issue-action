@@ -30,7 +30,7 @@ repos:
   - repo: https://github.com/rvben/rumdl-pre-commit
     rev: 83cecb6b523a053d7d3dfdc4798d705b505a88f9  # frozen: v0.2.78
     hooks:
-      - id: rumdl
+      - id: rumdl-check
         args: ["--fix"]
 
   - repo: https://github.com/scop/pre-commit-shfmt

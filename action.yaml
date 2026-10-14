@@ -31,20 +31,20 @@ inputs:
 outputs:
   broken:
     description: 'Number of unreachable links in the report.'
-    value: ${{ steps.collect.outputs.broken }}
+    value: ${{ steps.collect-broken-links.outputs.broken }}
   opened:
     description: 'Number of issues opened by this run.'
-    value: ${{ steps.open.outputs.opened }}
+    value: ${{ steps.open-issues.outputs.opened }}
   closed:
     description: 'Number of issues closed by this run.'
-    value: ${{ steps.close.outputs.closed }}
+    value: ${{ steps.close-issues.outputs.closed }}
 
 runs:
   using: composite
 
   steps:
     - name: Validate inputs
-      id: validate
+      id: validate-inputs
       shell: bash
       env:
         REPORT: ${{ inputs.report }}
@@ -52,50 +52,50 @@ runs:
       run: bash "${GITHUB_ACTION_PATH}/src/validate-inputs.sh"
 
     - name: Collect broken links
-      id: collect
+      id: collect-broken-links
       shell: bash
       env:
         REPORT: ${{ inputs.report }}
       run: bash "${GITHUB_ACTION_PATH}/src/collect-broken-links.sh"
 
     - name: List the reported issues
-      id: reported
+      id: list-reported-issues
       shell: bash
       env:
         GH_TOKEN: ${{ inputs.github-token }}
         GH_REPO: ${{ github.repository }}
-        NORMALIZED_LABEL: ${{ steps.validate.outputs.label }}
+        NORMALIZED_LABEL: ${{ steps.validate-inputs.outputs.label }}
       run: bash "${GITHUB_ACTION_PATH}/src/list-reported-issues.sh"
 
     - name: Create the missing labels
-      if: steps.collect.outputs.broken != '0'
+      if: steps.collect-broken-links.outputs.broken != '0'
       shell: bash
       env:
         GH_TOKEN: ${{ inputs.github-token }}
         GH_REPO: ${{ github.repository }}
         EXTRA_LABELS: ${{ inputs.extra-labels }}
-        NORMALIZED_LABEL: ${{ steps.validate.outputs.label }}
+        NORMALIZED_LABEL: ${{ steps.validate-inputs.outputs.label }}
       run: bash "${GITHUB_ACTION_PATH}/src/create-missing-labels.sh"
 
     - name: Open issues for the newly broken links
-      id: open
+      id: open-issues
       shell: bash
       env:
         GH_TOKEN: ${{ inputs.github-token }}
         GH_REPO: ${{ github.repository }}
         EXTRA_LABELS: ${{ inputs.extra-labels }}
         TITLE_PREFIX: ${{ inputs.title-prefix }}
-        NORMALIZED_LABEL: ${{ steps.validate.outputs.label }}
-        RECORDS: ${{ steps.collect.outputs.records }}
-        REPORTED: ${{ steps.reported.outputs.reported }}
+        NORMALIZED_LABEL: ${{ steps.validate-inputs.outputs.label }}
+        RECORDS: ${{ steps.collect-broken-links.outputs.records }}
+        REPORTED: ${{ steps.list-reported-issues.outputs.reported }}
       run: bash "${GITHUB_ACTION_PATH}/src/open-issues.sh"
 
     - name: Close the issues whose links recovered
-      id: close
+      id: close-issues
       shell: bash
       env:
         GH_TOKEN: ${{ inputs.github-token }}
         GH_REPO: ${{ github.repository }}
-        RECORDS: ${{ steps.collect.outputs.records }}
-        REPORTED: ${{ steps.reported.outputs.reported }}
+        RECORDS: ${{ steps.collect-broken-links.outputs.records }}
+        REPORTED: ${{ steps.list-reported-issues.outputs.reported }}
       run: bash "${GITHUB_ACTION_PATH}/src/close-issues.sh"

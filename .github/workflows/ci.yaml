@@ -97,7 +97,7 @@ jobs:
           ACTIONLINT_VERSION: '1.7.12'
         run: |
           go install "github.com/rhysd/actionlint/cmd/actionlint@v${ACTIONLINT_VERSION}"
-          echo "::add-matcher::.github/problem-matchers/actionlint.json"
+          echo '::add-matcher::.github/problem-matchers/actionlint.json'
           "$(go env GOPATH)/bin/actionlint" -color
 
   audit-zizmor:
@@ -196,7 +196,7 @@ jobs:
         env:
           JSON5_VERSION: '2.2.3'
         run: |
-          echo "::add-matcher::.github/problem-matchers/json5.json"
+          echo '::add-matcher::.github/problem-matchers/json5.json'
           exit_code=0
           while IFS= read -r -d '' json5_file; do
             npx --yes "json5@${JSON5_VERSION}" --validate "${json5_file}" 2>&1 \
@@ -397,7 +397,7 @@ jobs:
         env:
           SHELLCHECK_PY_VERSION: '0.11.0.1'
         run: |
-          echo "::add-matcher::.github/problem-matchers/shellcheck.json"
+          echo '::add-matcher::.github/problem-matchers/shellcheck.json'
           git ls-files -z '*.sh' \
             | xargs -0 -r uvx --from="shellcheck-py==${SHELLCHECK_PY_VERSION}" shellcheck --format=gcc
 
@@ -443,7 +443,7 @@ jobs:
           PUSH_BEFORE_SHA: ${{ github.event.before }}
         run: |
           if ! git cat-file -e "${PUSH_BEFORE_SHA}^{commit}" 2>/dev/null; then
-            echo "::notice title=cz check::Base commit unavailable (new branch or force push); skipping lint."
+            echo '::notice title=cz check::Base commit unavailable (new branch or force push); skipping lint.'
             exit 0
           fi
           cz check --rev-range="${PUSH_BEFORE_SHA}..${GITHUB_SHA}"

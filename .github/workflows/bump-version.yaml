@@ -37,7 +37,7 @@ jobs:
           permission-pull-requests: write
 
       - name: Bump version
-        uses: conjikidow/bump-version-action@ad50841c8316006b323ee097dbdb07b1f01fc41a # v4.2.2
+        uses: conjikidow/bump-version-action@f63d3275c47f3bf6348d6f58e47e9aee5addd55b # v4.2.3
         with:
           label-major: update::major
           label-minor: update::minor

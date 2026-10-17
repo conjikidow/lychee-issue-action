@@ -11,7 +11,7 @@ limit=1000
 listing="$(mktemp)"
 gh issue list --label="$(csv_field "${NORMALIZED_LABEL}")" --state=open --limit="${limit}" --json=number,body >"${listing}"
 
-if [ "$(jq 'length' "${listing}")" -ge "${limit}" ]; then
+if [[ "$(jq 'length' "${listing}")" -ge ${limit} ]]; then
   log_warn "More than ${limit} open issues carry the '${NORMALIZED_LABEL}' label, so the ones past that are ignored."
 fi
 

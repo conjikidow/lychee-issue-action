@@ -3,7 +3,7 @@ set -euo pipefail
 
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
-if [ ! -f "${REPORT}" ]; then
+if [[ ! -f ${REPORT} ]]; then
   log_error "No lychee report at ${REPORT}."
   exit 1
 fi
@@ -15,7 +15,7 @@ if [[ ${LABEL} == *,* || ${LABEL} == *$'\n'* ]]; then
 fi
 
 normalized="$(split_labels "${LABEL}")"
-if [ -z "${normalized}" ]; then
+if [[ -z ${normalized} ]]; then
   log_error 'The label input must not be empty.'
   exit 1
 fi

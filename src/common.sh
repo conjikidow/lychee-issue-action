@@ -45,7 +45,7 @@ split_labels() {
     # Only the padding around a name is dropped: 'help wanted' is a single label, not two.
     name="${name#"${name%%[![:space:]]*}"}"
     name="${name%"${name##*[![:space:]]}"}"
-    if [ -n "${name}" ]; then
+    if [[ -n ${name} ]]; then
       printf '%s\n' "${name}"
     fi
   done

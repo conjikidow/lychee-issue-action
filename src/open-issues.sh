@@ -43,7 +43,7 @@ write_body() {
   local present
   present="$(jq --raw-output --argjson limit "${refs_limit}" '[.refs[:$limit][].file] | unique[]' <<<"${record}" |
     while IFS= read -r file; do
-      if [ "$(git -C "${GITHUB_WORKSPACE}" cat-file -t "${GITHUB_SHA}:${file}" 2>/dev/null)" = 'blob' ]; then
+      if [[ "$(git -C "${GITHUB_WORKSPACE}" cat-file -t "${GITHUB_SHA}:${file}" 2>/dev/null)" == 'blob' ]]; then
         printf '%s\n' "${file}"
       fi
     done | jq --null-input --raw-input '[inputs]')"
@@ -87,7 +87,7 @@ while IFS= read -r record <&3; do
   status="$(jq --raw-output '.status | tostring' <<<"${record}")"
   budget="$(jq --raw-output --argjson limit "${body_limit}" --argjson overhead "${body_overhead}" \
     '$limit - $overhead - 2 * (.url | tostring | length) - (.status | tostring | length)' <<<"${record}")"
-  if [ "${budget}" -le 0 ]; then
+  if [[ ${budget} -le 0 ]]; then
     log_warn "No issue opened for ${url}: it does not fit in an issue body."
     continue
   fi
@@ -96,7 +96,7 @@ while IFS= read -r record <&3; do
   write_body "${record}" "${url}" "${status}" "${budget}" >"${body}"
   # GitHub rejects a title longer than 256 characters.
   title="${TITLE_PREFIX} ${url}"
-  if [ "${#title}" -gt 256 ]; then
+  if [[ ${#title} -gt 256 ]]; then
     title="${title:0:253}..."
   fi
 

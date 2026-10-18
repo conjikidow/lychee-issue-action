@@ -43,6 +43,6 @@ jobs:
           label-minor: update::minor
           label-patch: update::patch
           manual-bump-type: ${{ inputs.bump-type }}
-          labels-to-add: automated,versioning
+          labels-to-add: automated,release
           create-release: true
           github-token: ${{ steps.app-token.outputs.token }}

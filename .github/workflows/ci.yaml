@@ -137,8 +137,8 @@ jobs:
       - name: Audit with zizmor (SARIF upload)
         if: >-
           always()
+          && github.event_name == 'push'
           && github.event.repository.private == false
-          && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
         uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
         with:
           version: 'v1.30.1'

@@ -80,7 +80,11 @@
   color: 'D6D6D6'
 
 - name: dependencies
-  description: 'Update dependencies'
+  description: 'Runtime dependency update'
+  color: 'D6D6D6'
+
+- name: dev-dependencies
+  description: 'Development dependency update'
   color: 'D6D6D6'
 
 - name: release

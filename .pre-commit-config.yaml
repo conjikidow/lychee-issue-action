@@ -23,7 +23,7 @@ repos:
       - id: typos
 
   - repo: https://github.com/tombi-toml/tombi-pre-commit
-    rev: 2306a9334f9916a37d72c533926a4056fdc8482b  # frozen: v1.8.4
+    rev: 08e70e40a095571503c7079810352e942756259c  # frozen: v1.8.5
     hooks:
       - id: tombi-format
 
@@ -58,7 +58,7 @@ repos:
       - id: no-commit-to-branch
 
   - repo: https://github.com/tombi-toml/tombi-pre-commit
-    rev: 2306a9334f9916a37d72c533926a4056fdc8482b  # frozen: v1.8.4
+    rev: 08e70e40a095571503c7079810352e942756259c  # frozen: v1.8.5
     hooks:
       - id: tombi-lint
         args: [--error-on-warnings]

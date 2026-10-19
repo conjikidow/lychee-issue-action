@@ -132,6 +132,16 @@
       allowedVersions: '/^v?\\d+\\.\\d+\\.\\d+$/',
     },
     {
+      matchFileNames: [
+        '.github/workflows/**',
+        '.pre-commit-config.yaml',
+      ],
+      labels: [
+        'automated',
+        'dev-dependencies',
+      ],
+    },
+    {
       matchManagers: [
         'pre-commit',
       ],

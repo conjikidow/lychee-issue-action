@@ -210,11 +210,11 @@ jobs:
           while IFS= read -r -d '' json5_file; do
             npx --yes "json5@${JSON5_VERSION}" --validate "${json5_file}" 2>&1 \
               | while IFS= read -r line; do
-                  case "${line}" in
-                    'JSON5: '*) printf '%s: %s\n' "${json5_file}" "${line}" ;;
-                    *) printf '%s\n' "${line}" ;;
-                  esac
-                done \
+                case "${line}" in
+                  'JSON5: '*) printf '%s: %s\n' "${json5_file}" "${line}" ;;
+                  *) printf '%s\n' "${line}" ;;
+                esac
+              done \
               || exit_code=1
           done < <(git ls-files -z '*.json5')
           exit "${exit_code}"
@@ -453,7 +453,7 @@ jobs:
         env:
           PUSH_BEFORE_SHA: ${{ github.event.before }}
         run: |
-          if ! git cat-file -e "${PUSH_BEFORE_SHA}^{commit}" 2>/dev/null; then
+          if ! git cat-file -e "${PUSH_BEFORE_SHA}^{commit}" 2> /dev/null; then
             echo '::notice title=cz check::Base commit unavailable (new branch or force push); skipping lint.'
             exit 0
           fi

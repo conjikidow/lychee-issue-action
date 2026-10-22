@@ -11,7 +11,7 @@ log_error() {
 
 require_cmd() {
   local cmd="$1"
-  if ! command -v "${cmd}" >/dev/null 2>&1; then
+  if ! command -v "${cmd}" > /dev/null 2>&1; then
     log_error "Required command not found: ${cmd}. Install it on the runner to use this action."
     exit 1
   fi
@@ -20,7 +20,7 @@ require_cmd() {
 write_output() {
   local key="$1"
   local value="$2"
-  echo "${key}=${value}" >>"${GITHUB_OUTPUT}"
+  echo "${key}=${value}" >> "${GITHUB_OUTPUT}"
 }
 
 # GitHub asks for at least a second between mutative requests, to stay clear of its secondary rate limit.
@@ -40,7 +40,7 @@ split_labels() {
   local name
 
   # `read` stops at the first line, so a line break has to become a separator first.
-  IFS=',' read -ra names <<<"${raw//$'\n'/,}"
+  IFS=',' read -ra names <<< "${raw//$'\n'/,}"
   for name in "${names[@]}"; do
     # Only the padding around a name is dropped: 'help wanted' is a single label, not two.
     name="${name#"${name%%[![:space:]]*}"}"

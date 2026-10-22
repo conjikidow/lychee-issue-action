@@ -17,7 +17,7 @@ report_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/workflows/${workfl
 blob_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/blob/${GITHUB_SHA}"
 
 reported_urls="$(mktemp)"
-cut -f2 "${REPORTED}" >"${reported_urls}"
+cut -f2 "${REPORTED}" > "${reported_urls}"
 
 substitute="$(printf '\xEF\xBF\xBD')"
 autolink_pattern='^[a-zA-Z][a-zA-Z0-9+.-]{1,31}://[^[:space:][:cntrl:]<>]+$'
@@ -41,9 +41,9 @@ write_body() {
   fi
 
   local present
-  present="$(jq --raw-output --argjson limit "${refs_limit}" '[.refs[:$limit][].file] | unique[]' <<<"${record}" |
-    while IFS= read -r file; do
-      if [[ "$(git -C "${GITHUB_WORKSPACE}" cat-file -t "${GITHUB_SHA}:${file}" 2>/dev/null)" == 'blob' ]]; then
+  present="$(jq --raw-output --argjson limit "${refs_limit}" '[.refs[:$limit][].file] | unique[]' <<< "${record}" \
+    | while IFS= read -r file; do
+      if [[ "$(git -C "${GITHUB_WORKSPACE}" cat-file -t "${GITHUB_SHA}:${file}" 2> /dev/null)" == 'blob' ]]; then
         printf '%s\n' "${file}"
       fi
     done | jq --null-input --raw-input '[inputs]')"
@@ -71,7 +71,7 @@ write_body() {
     | ((.refs | length) - $kept) as $omitted
     | $lines[:$kept][],
       (if $omitted > 0 then "\nand \($omitted) more." else empty end)
-  ' <<<"${record}"
+  ' <<< "${record}"
   printf '\nSee the [workflow runs](%s) for the latest report.\n' "${report_url}"
   printf '\n<!-- lychee: %s -->\n' "${url}"
 }
@@ -79,21 +79,21 @@ write_body() {
 opened=0
 # The records are read on a dedicated descriptor so that gh keeps its own stdin.
 while IFS= read -r record <&3; do
-  url="$(jq --raw-output '.url' <<<"${record}")"
+  url="$(jq --raw-output '.url' <<< "${record}")"
   if grep -qxF -- "${url}" "${reported_urls}"; then
     continue
   fi
 
-  status="$(jq --raw-output '.status | tostring' <<<"${record}")"
+  status="$(jq --raw-output '.status | tostring' <<< "${record}")"
   budget="$(jq --raw-output --argjson limit "${body_limit}" --argjson overhead "${body_overhead}" \
-    '$limit - $overhead - 2 * (.url | tostring | length) - (.status | tostring | length)' <<<"${record}")"
+    '$limit - $overhead - 2 * (.url | tostring | length) - (.status | tostring | length)' <<< "${record}")"
   if [[ ${budget} -le 0 ]]; then
     log_warn "No issue opened for ${url}: it does not fit in an issue body."
     continue
   fi
 
   body="$(mktemp)"
-  write_body "${record}" "${url}" "${status}" "${budget}" >"${body}"
+  write_body "${record}" "${url}" "${status}" "${budget}" > "${body}"
   # GitHub rejects a title longer than 256 characters.
   title="${TITLE_PREFIX} ${url}"
   if [[ ${#title} -gt 256 ]]; then
@@ -103,6 +103,6 @@ while IFS= read -r record <&3; do
   gh issue create --title="${title}" --body-file="${body}" "${label_args[@]}"
   opened="$((opened + 1))"
   pace_mutation
-done 3<"${RECORDS}"
+done 3< "${RECORDS}"
 
 write_output 'opened' "${opened}"

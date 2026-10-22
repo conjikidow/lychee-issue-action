@@ -22,7 +22,7 @@ jq --compact-output --arg prefix "file://${GITHUB_WORKSPACE}/" --arg root "${GIT
       refs: (map({file, line}) | unique),
     })
   | .[]
-' "${REPORT}" >"${records}"
+' "${REPORT}" > "${records}"
 
 write_output 'records' "${records}"
-write_output 'broken' "$(wc -l <"${records}" | tr -d '[:space:]')"
+write_output 'broken' "$(wc -l < "${records}" | tr -d '[:space:]')"

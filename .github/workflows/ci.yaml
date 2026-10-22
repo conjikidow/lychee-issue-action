@@ -362,7 +362,9 @@ jobs:
           sudo apt-get --yes install shfmt
 
       - name: Format shell scripts
-        run: git ls-files -z '*.sh' | xargs -0 -r shfmt --write --simplify --indent=2
+        run: |
+          git ls-files -z '*.sh' \
+            | xargs -0 -r shfmt --write --simplify --indent=2 --binary-next-line --case-indent --space-redirects
 
       - name: Suggest shell script formatting
         if: github.event_name == 'pull_request'

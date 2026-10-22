@@ -64,7 +64,7 @@ jobs:
 
 Three of the `lychee-action` inputs above are not optional for this setup.
 `format: json` produces the machine-readable report this action reads, instead of the Markdown summary.
-`output: lychee/out.json` matches this action's `report` default; lychee-action otherwise writes `lychee/out.md`.
+`output: lychee/out.json` matches this action's `report` default; `lychee-action` otherwise writes `lychee/out.md`.
 `fail: false` keeps lychee from failing the job on broken links, which would stop this action from ever running.
 
 The `concurrency` group serializes the runs: two overlapping runs would both see the same set of open issues,

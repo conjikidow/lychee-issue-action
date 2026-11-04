@@ -21,6 +21,7 @@ A GitHub Action to track the broken links found by [lychee](https://github.com/l
 ## Usage
 
 The action requires `gh` and `jq`, which the GitHub-hosted runner images provide.
+It reads reports written by lychee 0.18 or later.
 
 ### Workflow Example
 
@@ -122,10 +123,12 @@ Define them in the repository beforehand if you do not want the action to create
 
 ## How It Works
 
-1. Reads the lychee report, grouping the failed and timed-out links by URL with every location that references them.
-2. Lists the open issues carrying `label`, and reads the `<!-- lychee: <url> -->` marker from each body.
-3. Opens an issue for every unreachable link that has no issue yet.
-4. Closes the issues whose links no longer appear in the report.
+1. Rejects a report that is empty, is not a lychee JSON report, or lists no links,
+   taking it as a sign of a failed or misconfigured lychee run.
+2. Reads the lychee report, grouping the failed and timed-out links by URL with every location that references them.
+3. Lists the open issues carrying `label`, and reads the `<!-- lychee: <url> -->` marker from each body.
+4. Opens an issue for every unreachable link that has no issue yet.
+5. Closes the issues whose links no longer appear in the report.
 
 > [!NOTE]
 > The marker in the issue body is what pairs an issue with a link.

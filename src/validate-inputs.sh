@@ -17,8 +17,8 @@ if [[ ! -s ${REPORT} ]]; then
   exit 1
 fi
 
-if ! jq --slurp --exit-status 'length == 1 and (.[0] | type == "object" and (.total | type) == "number")' "${REPORT}" > /dev/null; then
-  log_error "The lychee report at ${REPORT} was not written with --format json."
+if ! jq --slurp --exit-status 'length == 1 and (.[0] | type == "object" and (.total | type) == "number" and (.error_map | type) == "object")' "${REPORT}" > /dev/null; then
+  log_error "The lychee report at ${REPORT} is not a JSON report written by lychee 0.18 or later with --format json."
   exit 1
 fi
 

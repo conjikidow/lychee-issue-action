@@ -21,6 +21,7 @@ A GitHub Action to track the broken links found by [lychee](https://github.com/l
 ## Usage
 
 The action requires `gh` and `jq`, which the GitHub-hosted runner images provide.
+It reads reports written by lychee 0.18 or later.
 
 ### Workflow Example
 

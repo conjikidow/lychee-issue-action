@@ -2,6 +2,7 @@
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   extends: [
     'config:best-practices',
+    ':semanticCommitTypeAll(build)',
   ],
   minimumReleaseAge: '3 days',
   labels: [
@@ -136,6 +137,7 @@
         '.github/workflows/**',
         '.pre-commit-config.yaml',
       ],
+      semanticCommitScope: 'deps-dev',
       labels: [
         'automated',
         'dev-dependencies',

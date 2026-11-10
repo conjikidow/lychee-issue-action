@@ -60,7 +60,7 @@ jobs:
           fail: false
 
       - name: Sync the issues with the report
-        uses: conjikidow/lychee-issue-action@v0.4.0
+        uses: conjikidow/lychee-issue-action@v0.5.0
 ```
 
 Three of the `lychee-action` inputs above are not optional for this setup.

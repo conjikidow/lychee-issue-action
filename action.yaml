@@ -99,3 +99,12 @@ runs:
         RECORDS: ${{ steps.collect-broken-links.outputs.records }}
         REPORTED: ${{ steps.list-reported-issues.outputs.reported }}
       run: bash "${GITHUB_ACTION_PATH}/src/close-issues.sh"
+
+    - name: Write the job summary
+      shell: bash
+      env:
+        RECORDS: ${{ steps.collect-broken-links.outputs.records }}
+        REPORTED: ${{ steps.list-reported-issues.outputs.reported }}
+        OPENED_ISSUES: ${{ steps.open-issues.outputs.opened-issues }}
+        CLOSED_ISSUES: ${{ steps.close-issues.outputs.closed-issues }}
+      run: bash "${GITHUB_ACTION_PATH}/src/write-summary.sh"

@@ -76,6 +76,7 @@ write_body() {
   printf '\n<!-- lychee: %s -->\n' "${url}"
 }
 
+opened_issues="$(mktemp)"
 opened=0
 # The records are read on a dedicated descriptor so that gh keeps its own stdin.
 while IFS= read -r record <&3; do
@@ -100,9 +101,12 @@ while IFS= read -r record <&3; do
     title="${title:0:253}..."
   fi
 
-  gh issue create --title="${title}" --body-file="${body}" "${label_args[@]}"
+  issue_url="$(gh issue create --title="${title}" --body-file="${body}" "${label_args[@]}")"
+  echo "${issue_url}"
+  printf '%s\t%s\n' "${issue_url##*/}" "${url}" >> "${opened_issues}"
   opened="$((opened + 1))"
   pace_mutation
 done 3< "${RECORDS}"
 
 write_output 'opened' "${opened}"
+write_output 'opened-issues' "${opened_issues}"

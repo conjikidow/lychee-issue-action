@@ -9,6 +9,7 @@ require_cmd jq
 broken_urls="$(mktemp)"
 jq --raw-output '.url' "${RECORDS}" > "${broken_urls}"
 
+closed_issues="$(mktemp)"
 closed=0
 # The issues are read on a dedicated descriptor so that gh keeps its own stdin.
 while IFS=$'\t' read -r number url <&3; do
@@ -17,8 +18,10 @@ while IFS=$'\t' read -r number url <&3; do
   fi
 
   gh issue close "${number}" --comment='This link is reachable again.'
+  printf '%s\t%s\n' "${number}" "${url}" >> "${closed_issues}"
   closed="$((closed + 1))"
   pace_mutation
 done 3< "${REPORTED}"
 
 write_output 'closed' "${closed}"
+write_output 'closed-issues' "${closed_issues}"
